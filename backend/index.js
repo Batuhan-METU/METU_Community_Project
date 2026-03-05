@@ -1,12 +1,29 @@
 const express = require("express");
-const app = express();
-const PORT = 8080; // Genelde backend 5000 veya 8000'de çalışır
+const cors = require("cors");
+const dotenv = require("dotenv");
 
-// Bu bizim ilk "Endpoint"imiz (Kapımız)
-app.get("/", (req, res) => {
-  res.send("METUHub API Canavar Gibi Çalışıyor! 🚀");
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 8080;
+
+app.use(cors());
+app.use(express.json());
+
+// Basit health check
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok", service: "METUHub API" });
 });
 
+// Route modüllerini bağla
+const communitiesRouter = require("./src/routes/communities");
+const eventsRouter = require("./src/routes/events");
+const usersRouter = require("./src/routes/users");
+
+app.use("/api/communities", communitiesRouter);
+app.use("/api/events", eventsRouter);
+app.use("/api/users", usersRouter);
+
 app.listen(PORT, () => {
-  console.log(`Server şu an http://localhost:${PORT} adresinde aktif.`);
+  console.log(`METUHub API http://localhost:${PORT} adresinde çalışıyor.`);
 });

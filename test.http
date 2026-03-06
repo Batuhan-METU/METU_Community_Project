@@ -1,0 +1,41 @@
+### Kullanıcı Kayıt Testi
+POST http://localhost:8080/api/users/register
+Content-Type: application/json
+
+{
+  "email": "tayanc@metu.edu.tr",
+  "password": "Sifre123!",
+  "full_name": "Tayanç Daloğlu"
+}
+
+### Kullanıcı Giriş Testi (önce bunu çalıştır, token'ı al)
+# @name login
+POST http://localhost:8080/api/users/login
+Content-Type: application/json
+
+{
+  "email": "tayanc@metu.edu.tr",
+  "password": "Sifre123!"
+}
+
+### Korumalı Topluluk Oluşturma Testi (Token Olmadan - Hata Bekliyoruz)
+POST http://localhost:8080/api/communities
+Content-Type: application/json
+
+{
+  "name": "METU Skydiving",
+  "description": "Gökyüzüne aşık ODTÜ'lüler burada.",
+  "category": "Spor"
+}
+
+### Korumalı Topluluk Oluşturma Testi (Token İle - Önce "login" isteğini çalıştır)
+POST http://localhost:8080/api/communities
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6ImI4ODEzOWEwLTUyMjAtNDU4NC04NTAzLTBhNTZkNGNmY2I3ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL21ncm14cmlwdmJueHpja2hmb3d5LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI2ZmY5ZDBkZi0wNDcwLTQyNzUtYjIwZC0xNmI4MzI4NGZmYzgiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzcyODI4MDExLCJpYXQiOjE3NzI4MjQ0MTEsImVtYWlsIjoidGF5YW5jQG1ldHUuZWR1LnRyIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6InRheWFuY0BtZXR1LmVkdS50ciIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmdWxsX25hbWUiOiJUYXlhbsOnIERhbG_En2x1IiwicGhvbmVfdmVyaWZpZWQiOmZhbHNlLCJzdWIiOiI2ZmY5ZDBkZi0wNDcwLTQyNzUtYjIwZC0xNmI4MzI4NGZmYzgifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc3MjgyNDQxMX1dLCJzZXNzaW9uX2lkIjoiZTc2ZWUwMDktNzZiMS00ZTk5LThkNjgtNGI1ZGRmYWYxYzA2IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.mIoE8J4i43YJAzAM_xUnZN6RQcMl_jtCO39QppjSE4E-cSoG3Kp-We3xgqa5NVaw1zeigd2kFv5Xx4e-mr20mQ
+
+{
+  "name": "METU Motorsport",
+  "description": "Hız ve mühendislik bir arada.",
+  "category": "Teknik"
+}
+

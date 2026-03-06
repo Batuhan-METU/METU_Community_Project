@@ -1,39 +1,51 @@
-const express = require("express");
-
+const express = require('express');
 const router = express.Router();
+const supabase = require('../config/supabaseClient');
+const authMiddleware = require('../middleware/auth');
 
-// Şimdilik örnek data; sonra veritabanına bağlanacağız
-const sampleCommunities = [
-  {
-    id: 1,
-    name: "Eşli Dans Topluluğu",
-    slug: "esli-dans",
-    description: "Salsa, bachata ve daha fazlası için dans topluluğu.",
-    category: "Spor & Sanat",
-  },
-  {
-    id: 2,
-    name: "Müzik Topluluğu",
-    slug: "muzik",
-    description: "Konserler, jam session'lar ve müzik etkinlikleri.",
-    category: "Sanat",
-  },
-];
+// GET /api/communities — herkese açık
+router.get('/', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('communities')
+      .select('*');
 
-router.get("/", (req, res) => {
-  res.json(sampleCommunities);
+    if (error) throw error;
+
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Topluluklar getirilemedi.' });
+  }
 });
 
-router.get("/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const community = sampleCommunities.find((c) => c.id === id);
+// POST /api/communities — sadece giriş yapmış kullanıcılar
+router.post('/', authMiddleware, async (req, res) => {
+  try {
+    const { name, description, category } = req.body;
 
-  if (!community) {
-    return res.status(404).json({ message: "Topluluk bulunamadı" });
+    if (!name) {
+      return res.status(400).json({ error: 'Topluluk adı zorunludur.' });
+    }
+
+    const { data, error } = await supabase
+      .from('communities')
+      .insert({
+        name,
+        description: description || null,
+        category: category || null,
+        created_by: req.user.id,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      return res.status(400).json({ error: error.message });
+    }
+
+    res.status(201).json(data);
+  } catch (err) {
+    res.status(500).json({ error: 'Topluluk oluşturulamadı.' });
   }
-
-  res.json(community);
 });
 
 module.exports = router;
-

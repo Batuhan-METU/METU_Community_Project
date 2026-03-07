@@ -1,0 +1,69 @@
+export type EventCategory =
+  | "Engineering"
+  | "Business"
+  | "Art"
+  | "Music"
+  | "Science";
+
+export type MockEvent = {
+  id: number;
+  title: string;
+  club: string;
+  date: string;
+  location: string;
+  description: string;
+  category: EventCategory;
+};
+
+export const mockEvents: MockEvent[] = [
+  {
+    id: 1,
+    title: "Spring Coding Challenge Kickoff",
+    club: "METU Computer Society",
+    date: "2026-03-12T17:30:00",
+    location: "Informatics Institute Auditorium",
+    description:
+      "Join our semester kickoff challenge, meet fellow developers, and form teams for a 48-hour coding sprint focused on campus-life solutions.",
+    category: "Engineering",
+  },
+  {
+    id: 2,
+    title: "Astronomy Night Observation",
+    club: "METU Astronomy Club",
+    date: "2026-03-18T20:00:00",
+    location: "Physics Department Roof Terrace",
+    description:
+      "An evening under the stars with guided telescope sessions, constellation spotting, and a short intro to astrophotography for beginners.",
+    category: "Science",
+  },
+  {
+    id: 3,
+    title: "Sustainable Campus Workshop",
+    club: "METU Environmental Society",
+    date: "2026-03-22T14:00:00",
+    location: "Cultural and Convention Center, Hall B",
+    description:
+      "A hands-on workshop on reducing campus waste, improving recycling habits, and designing student-led sustainability initiatives.",
+    category: "Business",
+  },
+  {
+    id: 4,
+    title: "Beginner Salsa Social",
+    club: "METU Dance Club",
+    date: "2026-03-26T19:00:00",
+    location: "Student Activities Center Studio 2",
+    description:
+      "A friendly social dance night with beginner salsa lessons, partner rotations, and open practice for all skill levels.",
+    category: "Music",
+  },
+  {
+    id: 5,
+    title: "Indie Game Development Meetup",
+    club: "METU Game Development Community",
+    date: "2026-03-30T18:30:00",
+    location: "Engineering Faculty, Room E-105",
+    description:
+      "Present your indie prototypes, get peer feedback on gameplay loops, and connect with students interested in design, art, and code.",
+    category: "Art",
+  },
+];

@@ -1,14 +1,6 @@
-### Kullanıcı Kayıt Testi
-POST http://localhost:8080/api/users/register
-Content-Type: application/json
+@communityId = e772a4d1-98a3-44d9-a1a5-9dad9c5de59e
 
-{
-  "email": "tayanc@metu.edu.tr",
-  "password": "Sifre123!",
-  "full_name": "Tayanç Daloğlu"
-}
-
-### Kullanıcı Giriş Testi (önce bunu çalıştır, token'ı al)
+### Kullanıcı Giriş Testi (Önce buna bas!)
 # @name login
 POST http://localhost:8080/api/users/login
 Content-Type: application/json
@@ -18,20 +10,13 @@ Content-Type: application/json
   "password": "Sifre123!"
 }
 
-### Korumalı Topluluk Oluşturma Testi (Token Olmadan - Hata Bekliyoruz)
+### Token'ı Otomatik Yakala (Kritik Satır!)
+@authToken = {{login.response.body.session.access_token}}
+
+### Korumalı Topluluk Oluşturma Testi (Otomatik Token)
 POST http://localhost:8080/api/communities
 Content-Type: application/json
-
-{
-  "name": "METU Skydiving",
-  "description": "Gökyüzüne aşık ODTÜ'lüler burada.",
-  "category": "Spor"
-}
-
-### Korumalı Topluluk Oluşturma Testi (Token İle - Önce "login" isteğini çalıştır)
-POST http://localhost:8080/api/communities
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6ImI4ODEzOWEwLTUyMjAtNDU4NC04NTAzLTBhNTZkNGNmY2I3ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL21ncm14cmlwdmJueHpja2hmb3d5LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI2ZmY5ZDBkZi0wNDcwLTQyNzUtYjIwZC0xNmI4MzI4NGZmYzgiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzcyODI4MDExLCJpYXQiOjE3NzI4MjQ0MTEsImVtYWlsIjoidGF5YW5jQG1ldHUuZWR1LnRyIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6InRheWFuY0BtZXR1LmVkdS50ciIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmdWxsX25hbWUiOiJUYXlhbsOnIERhbG_En2x1IiwicGhvbmVfdmVyaWZpZWQiOmZhbHNlLCJzdWIiOiI2ZmY5ZDBkZi0wNDcwLTQyNzUtYjIwZC0xNmI4MzI4NGZmYzgifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc3MjgyNDQxMX1dLCJzZXNzaW9uX2lkIjoiZTc2ZWUwMDktNzZiMS00ZTk5LThkNjgtNGI1ZGRmYWYxYzA2IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.mIoE8J4i43YJAzAM_xUnZN6RQcMl_jtCO39QppjSE4E-cSoG3Kp-We3xgqa5NVaw1zeigd2kFv5Xx4e-mr20mQ
+Authorization: Bearer {{authToken}}
 
 {
   "name": "METU Motorsport",
@@ -39,3 +24,35 @@ Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6ImI4ODEzOWEwLTUyMjAtNDU4NC04NT
   "category": "Teknik"
 }
 
+### Etkinlik Oluştur (Başarılı - 201 Expected)
+POST http://localhost:8080/api/events/{{communityId}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "title": "C++ ile Oyun Geliştirme Workshop",
+  "description": "Unreal Engine temellerini öğreniyoruz. Laptopunuzu getirmeyi unutmayın!",
+  "starts_at": "2026-03-20T18:00:00Z",
+  "location": "METU Teknokent - Co-Working Space",
+  "capacity": 30
+}
+
+### 1. Etkinlikleri Listele (Katılacağımız Etkinliğin ID'sini Buradan Alacağız)
+# @name listEvents
+GET http://localhost:8080/api/events
+Authorization: Bearer {{authToken}}
+
+### Değişken Tanımlama (listEvents cevabındaki ilk id'yi alır)
+@eventId = {{listEvents.response.body.0.id}}
+
+### 2. Etkinliğe Katıl (İlk Sefer - 201 Expected)
+POST http://localhost:8080/api/events/join/{{eventId}}
+Authorization: Bearer {{authToken}}
+
+### 3. Tekrar Katılmayı Dene (Hata Testi - 409 Expected)
+POST http://localhost:8080/api/events/join/{{eventId}}
+Authorization: Bearer {{authToken}}
+
+### 4. Etkinlik Katılımcılarını Gör (200 Expected)
+GET http://localhost:8080/api/events/participants/{{eventId}}
+Authorization: Bearer {{authToken}}

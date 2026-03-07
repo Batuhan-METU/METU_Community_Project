@@ -1,0 +1,19 @@
+-- 1. İsmi slug'a çeviren fonksiyonu oluştur (Örn: "METU Motorsport" -> "metu-motorsport")
+CREATE OR REPLACE FUNCTION public.slugify_name()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- Eğer slug boş gelirse, name kısmını alıp slug'a çeviriyoruz
+  IF NEW.slug IS NULL OR NEW.slug = '' THEN
+    NEW.slug := lower(regexp_replace(NEW.name, '[^a-zA-Z0-9]+', '-', 'g'));
+    -- Sondaki tireleri temizle
+    NEW.slug := trim(both '-' from NEW.slug);
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- 2. Bu fonksiyonu communities tablosuna bağla
+CREATE TRIGGER trg_slugify_communities
+BEFORE INSERT ON public.communities
+FOR EACH ROW
+EXECUTE FUNCTION public.slugify_name();

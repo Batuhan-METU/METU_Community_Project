@@ -1,0 +1,15 @@
+CREATE TABLE public.profiles (
+  id uuid REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
+  full_name text,
+  interests text[], 
+  role text DEFAULT 'student',
+  updated_at timestamp with time zone DEFAULT now()
+);
+
+-- RLS'i bu tablo için de aktif edelim (Güvenlik önemli!)
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+-- Herkes kendi profilini görebilsin politikası
+CREATE POLICY "Users can view own profile" 
+ON public.profiles FOR SELECT 
+USING (auth.uid() = id);

@@ -1,0 +1,96 @@
+BEGIN;
+-- (Opsiyonel ama modern) UUID ve case-insensitive email için
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+CREATE EXTENSION IF NOT EXISTS "citext";
+-- updated_at otomasyonu
+CREATE OR REPLACE FUNCTION public.set_updated_at()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$;
+-- 1) USERS
+CREATE TABLE IF NOT EXISTS public.users (
+  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  full_name    text NOT NULL,
+  email        citext NOT NULL UNIQUE,
+  department   text,
+  class_year   smallint CHECK (class_year BETWEEN 1 AND 6),
+  created_at   timestamptz NOT NULL DEFAULT now(),
+  updated_at   timestamptz NOT NULL DEFAULT now()
+);
+DROP TRIGGER IF EXISTS trg_users_updated_at ON public.users;
+CREATE TRIGGER trg_users_updated_at
+BEFORE UPDATE ON public.users
+FOR EACH ROW
+EXECUTE FUNCTION public.set_updated_at();
+-- 2) COMMUNITIES
+CREATE TABLE IF NOT EXISTS public.communities (
+  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name         text NOT NULL,
+  slug         text NOT NULL UNIQUE,              -- örn: "metu-ieee"
+  description  text,
+  category     text,
+  logo_url     text,
+  created_by   uuid REFERENCES public.users(id) ON DELETE SET NULL,
+  created_at   timestamptz NOT NULL DEFAULT now(),
+  updated_at   timestamptz NOT NULL DEFAULT now()
+);
+DROP TRIGGER IF EXISTS trg_communities_updated_at ON public.communities;
+CREATE TRIGGER trg_communities_updated_at
+BEFORE UPDATE ON public.communities
+FOR EACH ROW
+EXECUTE FUNCTION public.set_updated_at();
+-- 3) EVENTS (her event bir community'ye ait)
+CREATE TABLE IF NOT EXISTS public.events (
+  id                    uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  community_id          uuid NOT NULL REFERENCES public.communities(id) ON DELETE CASCADE,
+  title                 text NOT NULL,
+  slug                  text NOT NULL,            -- community içinde unique yapıyoruz
+  description           text,
+  location              text,
+  starts_at             timestamptz NOT NULL,
+  ends_at               timestamptz,
+  application_deadline  timestamptz,
+  capacity              integer CHECK (capacity IS NULL OR capacity >= 1),
+  is_paid               boolean NOT NULL DEFAULT false,
+  ticket_price          numeric(10,2) CHECK (ticket_price IS NULL OR ticket_price >= 0),
+  iban                  text,
+  created_by            uuid REFERENCES public.users(id) ON DELETE SET NULL,
+  created_at            timestamptz NOT NULL DEFAULT now(),
+  updated_at            timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT events_ends_after_starts CHECK (ends_at IS NULL OR ends_at >= starts_at),
+  CONSTRAINT events_slug_unique_per_community UNIQUE (community_id, slug)
+);
+CREATE INDEX IF NOT EXISTS idx_events_community_starts_at
+ON public.events (community_id, starts_at);
+DROP TRIGGER IF EXISTS trg_events_updated_at ON public.events;
+CREATE TRIGGER trg_events_updated_at
+BEFORE UPDATE ON public.events
+FOR EACH ROW
+EXECUTE FUNCTION public.set_updated_at();
+-- 4) APPLICATIONS (user -> event başvurusu)
+CREATE TABLE IF NOT EXISTS public.applications (
+  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  event_id     uuid NOT NULL REFERENCES public.events(id) ON DELETE CASCADE,
+  user_id      uuid NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  status       text NOT NULL DEFAULT 'pending'
+               CHECK (status IN ('pending', 'approved', 'rejected', 'cancelled')),
+  answers      jsonb NOT NULL DEFAULT '{}'::jsonb,   -- form cevapları vb.
+  note         text,
+  created_at   timestamptz NOT NULL DEFAULT now(),
+  updated_at   timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT applications_one_per_user_per_event UNIQUE (event_id, user_id)
+);
+CREATE INDEX IF NOT EXISTS idx_applications_event_id ON public.applications (event_id);
+CREATE INDEX IF NOT EXISTS idx_applications_user_id  ON public.applications (user_id);
+CREATE INDEX IF NOT EXISTS idx_applications_status   ON public.applications (status);
+DROP TRIGGER IF EXISTS trg_applications_updated_at ON public.applications;
+CREATE TRIGGER trg_applications_updated_at
+BEFORE UPDATE ON public.applications
+FOR EACH ROW
+EXECUTE FUNCTION public.set_updated_at();
+COMMIT;

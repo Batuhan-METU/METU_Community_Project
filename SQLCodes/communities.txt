@@ -1,0 +1,10 @@
+-- 1. Eski (yanlış) kuralı kaldır
+ALTER TABLE public.communities
+DROP CONSTRAINT IF EXISTS communities_created_by_fkey;
+
+-- 2. Yeni ve doğru kuralı ekle (auth.users tablosunu baz alacak)
+ALTER TABLE public.communities
+ADD CONSTRAINT communities_created_by_fkey
+FOREIGN KEY (created_by)
+REFERENCES auth.users (id)
+ON DELETE CASCADE;

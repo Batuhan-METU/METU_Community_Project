@@ -25,26 +25,21 @@ export default function EventsPage() {
   }, [searchText, selectedCategory]);
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-10 md:py-14">
-      <h1 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">
-        All Events
-      </h1>
-      <p className="mt-2 text-sm text-slate-500">
+    <div className="mx-auto max-w-5xl px-6 py-10">
+      <h1 className="text-2xl font-semibold text-gray-900">All Events</h1>
+      <p className="mt-1 text-sm text-gray-500">
         Find events by club name, category, or topic.
       </p>
 
-      <div className="mt-6">
+      <div className="mt-5 space-y-3">
         <SearchBar value={searchText} onChange={setSearchText} />
-      </div>
-
-      <div className="mt-4">
         <FilterBar
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
         />
       </div>
 
-      <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {filteredEvents.map((event) => (
           <EventCard
             key={event.id}
@@ -60,7 +55,7 @@ export default function EventsPage() {
       </div>
 
       {filteredEvents.length === 0 && (
-        <p className="mt-8 text-sm text-slate-500">No events found</p>
+        <p className="mt-8 text-sm text-gray-400">No events found</p>
       )}
     </div>
   );

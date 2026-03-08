@@ -1,0 +1,13 @@
+-- events.created_by, public.users(id)'e bağlı ama backend auth.users kullanıyor.
+-- communities.txt ile aynı mantık: FK'yı auth.users(id)'e çeviriyoruz.
+
+-- 1. Eski (yanlış) kuralı kaldır
+ALTER TABLE public.events
+DROP CONSTRAINT IF EXISTS events_created_by_fkey;
+
+-- 2. Yeni ve doğru kuralı ekle (auth.users tablosunu baz alacak)
+ALTER TABLE public.events
+ADD CONSTRAINT events_created_by_fkey
+FOREIGN KEY (created_by)
+REFERENCES auth.users (id)
+ON DELETE SET NULL;

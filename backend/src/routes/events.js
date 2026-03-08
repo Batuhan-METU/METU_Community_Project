@@ -1,45 +1,183 @@
-const express = require("express");
-
+const express = require('express');
 const router = express.Router();
+const supabase = require('../config/supabaseClient');
+const authMiddleware = require('../middleware/auth');
 
-// Örnek etkinlik verisi
-const sampleEvents = [
-  {
-    id: 1,
-    communityId: 1,
-    title: "Eşli Dans Partisi",
-    description: "Salsa ve bachata gecesi.",
-    dateTime: "2026-03-20T20:00:00Z",
-    location: "ODTÜ Kültür ve Kongre Merkezi",
-    ticketPrice: 150,
-    iban: "TR00 0000 0000 0000 0000 0000 00",
-  },
-  {
-    id: 2,
-    communityId: 2,
-    title: "Akustik Konser",
-    description: "Kampüs akustik konser serisi.",
-    dateTime: "2026-03-25T19:30:00Z",
-    location: "ODTÜ Amfi Tiyatro",
-    ticketPrice: 0,
-    iban: null,
-  },
-];
+// GET /api/events — tüm etkinlikleri listele (herkese açık)
+router.get('/', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('events')
+      .select('*')
+      .order('starts_at', { ascending: true });
 
-router.get("/", (req, res) => {
-  res.json(sampleEvents);
+    if (error) throw error;
+
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Etkinlikler getirilemedi.' });
+  }
 });
 
-router.get("/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const event = sampleEvents.find((e) => e.id === id);
+// GET /api/events/participants/:event_id — etkinliğe kimlerin katıldığını listele (herkese açık)
+router.get('/participants/:event_id', async (req, res) => {
+  try {
+    const { event_id } = req.params;
 
-  if (!event) {
-    return res.status(404).json({ message: "Etkinlik bulunamadı" });
+    const { data, error } = await supabase
+      .from('event_participants')
+      .select('id, user_id, created_at')
+      .eq('event_id', event_id);
+
+    if (error) throw error;
+
+    res.json({ event_id, participant_count: data.length, participants: data });
+  } catch (err) {
+    res.status(500).json({ error: 'Katılımcılar getirilemedi.' });
   }
+});
 
-  res.json(event);
+// POST /api/events/join/:event_id — giriş yapan kullanıcıyı etkinliğe kaydet (auth gerekli)
+router.post('/join/:event_id', authMiddleware, async (req, res) => {
+  try {
+    const { event_id } = req.params;
+
+    const { data: existing, error: existingError } = await supabase
+      .from('event_participants')
+      .select('id')
+      .eq('event_id', event_id)
+      .eq('user_id', req.user.id)
+      .maybeSingle();
+
+    if (existingError) throw existingError;
+
+    if (existing) {
+      return res.status(409).json({ error: 'Bu etkinliğe zaten kayıtlısınız.' });
+    }
+
+    const { data: event, error: eventError } = await supabase
+      .from('events')
+      .select('id, capacity')
+      .eq('id', event_id)
+      .single();
+
+    if (eventError || !event) {
+      return res.status(404).json({ error: 'Etkinlik bulunamadı.' });
+    }
+
+    if (event.capacity !== null) {
+      const { count, error: countError } = await supabase
+        .from('event_participants')
+        .select('id', { count: 'exact', head: true })
+        .eq('event_id', event_id);
+
+      if (countError) throw countError;
+
+      if (count >= event.capacity) {
+        return res.status(403).json({ error: 'Kontenjan dolu.' });
+      }
+    }
+
+    const { data, error } = await supabase
+      .from('event_participants')
+      .insert({
+        event_id,
+        user_id: req.user.id,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      return res.status(400).json({ error: error.message });
+    }
+
+    res.status(201).json(data);
+  } catch (err) {
+    res.status(500).json({ error: 'Etkinliğe kayıt yapılamadı.' });
+  }
+});
+
+// POST /api/events/:community_id — sadece topluluğu oluşturan kişi etkinlik açabilsin
+router.post('/:community_id', authMiddleware, async (req, res) => {
+  try {
+    const { community_id } = req.params;
+    const {
+      title,
+      description,
+      location,
+      starts_at,
+      ends_at,
+      application_deadline,
+      capacity,
+      is_paid,
+      ticket_price,
+      iban,
+      slug,
+    } = req.body;
+
+    if (!title) {
+      return res.status(400).json({ error: 'Etkinlik başlığı zorunludur.' });
+    }
+
+    if (!starts_at) {
+      return res.status(400).json({ error: 'Başlangıç tarihi (starts_at) zorunludur.' });
+    }
+
+    const { data: community, error: communityError } = await supabase
+      .from('communities')
+      .select('id, created_by')
+      .eq('id', community_id)
+      .single();
+
+    if (communityError || !community) {
+      return res.status(404).json({ error: 'Topluluk bulunamadı.' });
+    }
+
+    if (community.created_by !== req.user.id) {
+      return res.status(403).json({ error: 'Sadece topluluğu oluşturan kişi etkinlik ekleyebilir.' });
+    }
+
+    const eventSlug =
+      slug ||
+      title
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '') ||
+      'etkinlik';
+
+    const { data, error } = await supabase
+      .from('events')
+      .insert({
+        community_id,
+        title,
+        slug: eventSlug,
+        description: description || null,
+        location: location || null,
+        starts_at,
+        ends_at: ends_at || null,
+        application_deadline: application_deadline || null,
+        capacity: capacity ?? null,
+        is_paid: is_paid ?? false,
+        ticket_price: ticket_price ?? null,
+        iban: iban || null,
+        created_by: req.user.id,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      if (error.code === '23505') {
+        return res.status(400).json({ error: 'Bu toplulukta aynı slug ile etkinlik zaten var.' });
+      }
+      return res.status(400).json({ error: error.message });
+    }
+
+    res.status(201).json(data);
+  } catch (err) {
+    res.status(500).json({ error: 'Etkinlik oluşturulamadı.' });
+  }
 });
 
 module.exports = router;
-

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import EventCard from "../../components/EventCard";
 import { mockClubs } from "../../lib/mockClubs";
@@ -19,36 +20,53 @@ export default async function ClubDetailPage({ params }: ClubDetailPageProps) {
   const clubEvents = mockEvents.filter((event) => event.club === club.name);
 
   return (
-    <div className="mx-auto max-w-5xl px-6 py-10 md:py-14">
-      <article className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm md:p-8">
-        <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
-          {club.category}
-        </p>
+    <div className="mx-auto max-w-6xl px-6 py-10 md:py-14">
+      <Link
+        href="/clubs"
+        className="inline-flex items-center gap-1 text-sm text-slate-500 transition-colors hover:text-indigo-400"
+      >
+        &larr; Back to clubs
+      </Link>
 
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-zinc-900 md:text-4xl">
-          {club.name}
-        </h1>
+      <article className="mt-6 rounded-2xl border border-white/[0.06] bg-surface p-6 md:p-8">
+        <div className="flex items-center gap-4">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-500/10 text-lg font-bold text-indigo-400 ring-1 ring-indigo-500/20">
+            {club.name.charAt(0)}
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
+              {club.category}
+            </p>
+            <h1 className="mt-1 text-3xl font-semibold tracking-tight text-white md:text-4xl">
+              {club.name}
+            </h1>
+          </div>
+        </div>
 
-        <p className="mt-6 leading-7 text-zinc-700">{club.description}</p>
+        <p className="mt-6 leading-7 text-slate-400">{club.description}</p>
 
-        <div className="mt-6 grid gap-3 text-sm text-zinc-600 sm:grid-cols-2">
-          <p>
-            <span className="font-medium text-zinc-800">Category:</span>{" "}
-            {club.category}
-          </p>
-          <p>
-            <span className="font-medium text-zinc-800">Number of Events:</span>{" "}
-            {club.numberOfEvents}
-          </p>
+        <div className="mt-6 grid gap-3 text-sm sm:grid-cols-2">
+          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+            <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
+              Category
+            </p>
+            <p className="mt-1 text-slate-300">{club.category}</p>
+          </div>
+          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+            <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
+              Total Events
+            </p>
+            <p className="mt-1 text-slate-300">{club.numberOfEvents}</p>
+          </div>
         </div>
       </article>
 
-      <section className="mt-10">
-        <h2 className="text-2xl font-semibold tracking-tight text-zinc-900">
+      <section className="mt-12">
+        <h2 className="text-2xl font-semibold tracking-tight text-white">
           Club Events
         </h2>
 
-        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {clubEvents.map((event) => (
             <EventCard
               key={event.id}
@@ -57,12 +75,14 @@ export default async function ClubDetailPage({ params }: ClubDetailPageProps) {
               club={event.club}
               date={event.date}
               location={event.location}
+              filledSeats={event.filledSeats}
+              totalSeats={event.totalSeats}
             />
           ))}
         </div>
 
         {clubEvents.length === 0 && (
-          <p className="mt-4 text-sm text-zinc-500">
+          <p className="mt-6 text-sm text-slate-500">
             No events are available for this club yet.
           </p>
         )}

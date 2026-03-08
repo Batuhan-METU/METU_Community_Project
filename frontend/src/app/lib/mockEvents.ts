@@ -13,6 +13,8 @@ export type MockEvent = {
   location: string;
   description: string;
   category: EventCategory;
+  filledSeats: number;
+  totalSeats: number;
 };
 
 export const mockEvents: MockEvent[] = [
@@ -25,6 +27,8 @@ export const mockEvents: MockEvent[] = [
     description:
       "Join our semester kickoff challenge, meet fellow developers, and form teams for a 48-hour coding sprint focused on campus-life solutions.",
     category: "Engineering",
+    filledSeats: 78,
+    totalSeats: 100,
   },
   {
     id: 2,
@@ -35,6 +39,8 @@ export const mockEvents: MockEvent[] = [
     description:
       "An evening under the stars with guided telescope sessions, constellation spotting, and a short intro to astrophotography for beginners.",
     category: "Science",
+    filledSeats: 42,
+    totalSeats: 60,
   },
   {
     id: 3,
@@ -45,6 +51,8 @@ export const mockEvents: MockEvent[] = [
     description:
       "A hands-on workshop on reducing campus waste, improving recycling habits, and designing student-led sustainability initiatives.",
     category: "Business",
+    filledSeats: 35,
+    totalSeats: 50,
   },
   {
     id: 4,
@@ -55,6 +63,8 @@ export const mockEvents: MockEvent[] = [
     description:
       "A friendly social dance night with beginner salsa lessons, partner rotations, and open practice for all skill levels.",
     category: "Music",
+    filledSeats: 66,
+    totalSeats: 80,
   },
   {
     id: 5,
@@ -65,5 +75,7 @@ export const mockEvents: MockEvent[] = [
     description:
       "Present your indie prototypes, get peer feedback on gameplay loops, and connect with students interested in design, art, and code.",
     category: "Art",
+    filledSeats: 28,
+    totalSeats: 40,
   },
 ];

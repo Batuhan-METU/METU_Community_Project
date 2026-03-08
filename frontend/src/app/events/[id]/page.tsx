@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import JoinEventButton from "../../components/JoinEventButton";
 import { mockEvents } from "../../lib/mockEvents";
 
 type EventDetailPageProps = {
@@ -50,9 +51,7 @@ export default async function EventDetailPage({
 
         <p className="mt-6 leading-7 text-zinc-700">{event.description}</p>
 
-        <button className="mt-8 rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-800">
-          Join Event
-        </button>
+        <JoinEventButton />
       </article>
     </div>
   );

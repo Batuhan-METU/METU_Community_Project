@@ -6,6 +6,7 @@ interface EventCardProps {
   club: string;
   date: string;
   location: string;
+  joined?: boolean;
 }
 
 export default function EventCard({
@@ -14,6 +15,7 @@ export default function EventCard({
   club,
   date,
   location,
+  joined = false,
 }: EventCardProps) {
   const formattedDate = new Date(date).toLocaleDateString("tr-TR", {
     day: "2-digit",
@@ -30,9 +32,16 @@ export default function EventCard({
       <article className="h-full rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
         <div className="flex h-full flex-col justify-between gap-6">
           <div className="space-y-3">
-            <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
-              {club}
-            </p>
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+                {club}
+              </p>
+              {joined && (
+                <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700">
+                  Joined
+                </span>
+              )}
+            </div>
             <h3 className="line-clamp-2 text-lg font-semibold leading-snug text-zinc-900">
               {title}
             </h3>

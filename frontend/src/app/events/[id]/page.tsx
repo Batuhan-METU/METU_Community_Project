@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import JoinEventButton from "../../components/JoinEventButton";
 import { mockEvents } from "../../lib/mockEvents";
@@ -28,28 +29,62 @@ export default async function EventDetailPage({
     minute: "2-digit",
   });
 
+  const safeTotalSeats = Math.max(event.totalSeats, 1);
+  const capacityPercent = Math.min(
+    (event.filledSeats / safeTotalSeats) * 100,
+    100
+  );
+
   return (
     <div className="mx-auto max-w-3xl px-6 py-10 md:py-14">
-      <article className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm md:p-8">
-        <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+      <Link
+        href="/events"
+        className="inline-flex items-center gap-1 text-sm text-slate-500 transition-colors hover:text-indigo-400"
+      >
+        &larr; Back to events
+      </Link>
+
+      <article className="mt-6 rounded-2xl border border-white/[0.06] bg-surface p-6 md:p-8">
+        <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
           {event.club}
         </p>
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-zinc-900 md:text-4xl">
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white md:text-4xl">
           {event.title}
         </h1>
 
-        <div className="mt-6 space-y-2 text-sm text-zinc-600">
-          <p>
-            <span className="font-medium text-zinc-800">Date:</span>{" "}
-            {formattedDate} at {formattedTime}
-          </p>
-          <p>
-            <span className="font-medium text-zinc-800">Location:</span>{" "}
-            {event.location}
-          </p>
+        <div className="mt-6 grid gap-3 text-sm sm:grid-cols-2">
+          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+            <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
+              Date & Time
+            </p>
+            <p className="mt-1 text-slate-300">
+              {formattedDate} at {formattedTime}
+            </p>
+          </div>
+          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+            <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
+              Location
+            </p>
+            <p className="mt-1 text-slate-300">{event.location}</p>
+          </div>
         </div>
 
-        <p className="mt-6 leading-7 text-zinc-700">{event.description}</p>
+        <p className="mt-6 leading-7 text-slate-400">{event.description}</p>
+
+        <div className="mt-6 space-y-2">
+          <div className="flex items-center justify-between text-xs text-slate-500">
+            <span>Capacity</span>
+            <span>
+              {event.filledSeats} / {event.totalSeats} seats filled
+            </span>
+          </div>
+          <div className="h-2 w-full overflow-hidden rounded-full bg-white/[0.06]">
+            <div
+              className="h-full rounded-full bg-indigo-500/70 transition-all duration-500"
+              style={{ width: `${capacityPercent}%` }}
+            />
+          </div>
+        </div>
 
         <JoinEventButton />
       </article>

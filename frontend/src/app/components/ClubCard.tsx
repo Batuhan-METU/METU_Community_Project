@@ -15,32 +15,25 @@ export default function ClubCard({
 }: ClubCardProps) {
   return (
     <Link href={`/clubs/${id}`} className="group block h-full">
-      <article className="relative h-full overflow-hidden rounded-2xl border border-white/[0.06] bg-surface p-5 transition-all duration-300 hover:-translate-y-1 hover:border-white/[0.1] hover:shadow-xl hover:shadow-indigo-500/[0.08]">
-        <div className="flex h-full flex-col justify-between gap-5">
-          <div className="space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 text-xs font-bold text-indigo-400 ring-1 ring-indigo-500/20">
-                {name.charAt(0)}
-              </div>
-              <h3 className="text-lg font-semibold tracking-tight text-white">
-                {name}
-              </h3>
+      <article className="flex h-full flex-col justify-between rounded-md border border-gray-200 p-5 transition-colors hover:border-gray-300 hover:bg-gray-50">
+        <div className="space-y-2">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-gray-100 text-sm font-semibold text-gray-600">
+              {name.charAt(0)}
             </div>
-
-            <p className="line-clamp-3 text-sm leading-6 text-slate-400">
-              {description}
-            </p>
-
-            <p className="text-sm text-slate-500">
-              <span className="font-medium text-slate-300">{eventCount}</span>{" "}
-              events
-            </p>
+            <h3 className="text-base font-semibold text-gray-900">{name}</h3>
           </div>
-
-          <span className="block w-full rounded-lg bg-white/[0.06] px-4 py-2.5 text-center text-sm font-medium text-slate-300 transition-all duration-200 group-hover:bg-indigo-500/20 group-hover:text-indigo-300">
-            View Club
-          </span>
+          <p className="line-clamp-2 text-sm leading-relaxed text-gray-500">
+            {description}
+          </p>
+          <p className="text-sm text-gray-400">
+            <span className="font-medium text-gray-600">{eventCount}</span>{" "}
+            events
+          </p>
         </div>
+        <p className="mt-4 text-sm font-medium text-gray-400 transition-colors group-hover:text-gray-700">
+          View club &rarr;
+        </p>
       </article>
     </Link>
   );

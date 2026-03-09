@@ -32,10 +32,10 @@ export default function FilterBar({
             key={category}
             type="button"
             onClick={() => onCategoryChange(category)}
-            className={`rounded-lg border px-4 py-2 text-sm font-medium transition-all duration-200 ${
+            className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
               isActive
-                ? "border-indigo-500/30 bg-indigo-500/10 text-indigo-300 shadow-sm shadow-indigo-500/10"
-                : "border-white/[0.06] bg-surface text-slate-400 hover:border-white/[0.1] hover:text-white"
+                ? "bg-gray-900 text-white"
+                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
             }`}
             aria-pressed={isActive}
           >

@@ -25,19 +25,16 @@ export default function EventsPage() {
   }, [searchText, selectedCategory]);
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-10 md:py-14">
-      <h1 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">
+    <div className="mx-auto max-w-5xl px-6 py-12">
+      <h1 className="text-2xl font-bold tracking-tight text-gray-900">
         All Events
       </h1>
-      <p className="mt-2 text-sm text-slate-500">
+      <p className="mt-1 text-sm text-gray-500">
         Find events by club name, category, or topic.
       </p>
 
-      <div className="mt-6">
+      <div className="mt-6 space-y-3">
         <SearchBar value={searchText} onChange={setSearchText} />
-      </div>
-
-      <div className="mt-4">
         <FilterBar
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
@@ -60,7 +57,7 @@ export default function EventsPage() {
       </div>
 
       {filteredEvents.length === 0 && (
-        <p className="mt-8 text-sm text-slate-500">No events found</p>
+        <p className="mt-8 text-sm text-gray-400">No events found</p>
       )}
     </div>
   );

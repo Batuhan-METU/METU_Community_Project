@@ -29,58 +29,59 @@ export default async function EventDetailPage({
     minute: "2-digit",
   });
 
-  const safeTotalSeats = Math.max(event.totalSeats, 1);
   const capacityPercent = Math.min(
-    (event.filledSeats / safeTotalSeats) * 100,
+    (event.filledSeats / Math.max(event.totalSeats, 1)) * 100,
     100
   );
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-10 md:py-14">
+    <div className="mx-auto max-w-2xl px-6 py-12">
       <Link
         href="/events"
-        className="inline-flex items-center gap-1 text-sm text-slate-500 transition-colors hover:text-indigo-400"
+        className="text-sm text-gray-400 hover:text-gray-700"
       >
         &larr; Back to events
       </Link>
 
-      <article className="mt-6 rounded-2xl border border-white/[0.06] bg-surface p-6 md:p-8">
-        <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
+      <article className="mt-8">
+        <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
           {event.club}
         </p>
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white md:text-4xl">
+        <h1 className="mt-2 text-3xl font-bold tracking-tight text-gray-900">
           {event.title}
         </h1>
 
-        <div className="mt-6 grid gap-3 text-sm sm:grid-cols-2">
-          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
-            <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
-              Date & Time
-            </p>
-            <p className="mt-1 text-slate-300">
-              {formattedDate} at {formattedTime}
-            </p>
+        <dl className="mt-8 grid gap-px overflow-hidden rounded-md border border-gray-200 bg-gray-200 text-sm sm:grid-cols-2">
+          <div className="bg-white p-4">
+            <dt className="text-xs font-medium uppercase tracking-wide text-gray-400">
+              Date &amp; Time
+            </dt>
+            <dd className="mt-1 text-gray-700">
+              {formattedDate}, {formattedTime}
+            </dd>
           </div>
-          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
-            <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
+          <div className="bg-white p-4">
+            <dt className="text-xs font-medium uppercase tracking-wide text-gray-400">
               Location
-            </p>
-            <p className="mt-1 text-slate-300">{event.location}</p>
+            </dt>
+            <dd className="mt-1 text-gray-700">{event.location}</dd>
           </div>
-        </div>
+        </dl>
 
-        <p className="mt-6 leading-7 text-slate-400">{event.description}</p>
+        <p className="mt-8 text-base leading-7 text-gray-600">
+          {event.description}
+        </p>
 
-        <div className="mt-6 space-y-2">
-          <div className="flex items-center justify-between text-xs text-slate-500">
+        <div className="mt-8">
+          <div className="flex items-center justify-between text-xs text-gray-400">
             <span>Capacity</span>
             <span>
-              {event.filledSeats} / {event.totalSeats} seats filled
+              {event.filledSeats}/{event.totalSeats} seats
             </span>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-white/[0.06]">
+          <div className="mt-1.5 h-1.5 w-full rounded-full bg-gray-100">
             <div
-              className="h-full rounded-full bg-indigo-500/70 transition-all duration-500"
+              className="h-full rounded-full bg-gray-800 transition-all duration-500"
               style={{ width: `${capacityPercent}%` }}
             />
           </div>

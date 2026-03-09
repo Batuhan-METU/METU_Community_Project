@@ -15,17 +15,15 @@ export default function ProfilePage() {
   );
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-10 md:py-14">
-      <section className="rounded-2xl border border-white/[0.06] bg-surface p-6 md:p-8">
-        <div className="flex items-center gap-5">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-500/10 text-lg font-bold text-indigo-400 ring-1 ring-indigo-500/20">
+    <div className="mx-auto max-w-5xl px-6 py-12">
+      <section className="border-b border-gray-200 pb-8">
+        <div className="flex items-center gap-4">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 text-base font-semibold text-gray-600">
             BK
           </div>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-white md:text-3xl">
-              Batuhan Kaya
-            </h1>
-            <p className="mt-1 text-sm text-slate-400">
+            <h1 className="text-xl font-bold text-gray-900">Batuhan Kaya</h1>
+            <p className="mt-0.5 text-sm text-gray-500">
               Computer engineering student exploring clubs, workshops, and
               events across campus.
             </p>
@@ -33,11 +31,9 @@ export default function ProfilePage() {
         </div>
       </section>
 
-      <section className="mt-12">
-        <h2 className="text-2xl font-semibold tracking-tight text-white">
-          Joined Events
-        </h2>
-        <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <section className="mt-10">
+        <h2 className="text-lg font-bold text-gray-900">Joined Events</h2>
+        <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {joinedEvents.map((event) => (
             <EventCard
               key={event.id}
@@ -54,11 +50,9 @@ export default function ProfilePage() {
         </div>
       </section>
 
-      <section className="mt-12">
-        <h2 className="text-2xl font-semibold tracking-tight text-white">
-          Interested Clubs
-        </h2>
-        <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <section className="mt-10">
+        <h2 className="text-lg font-bold text-gray-900">Interested Clubs</h2>
+        <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {interestedClubs.map((club) => (
             <ClubCard
               key={club.id}

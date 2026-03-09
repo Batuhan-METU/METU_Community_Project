@@ -15,7 +15,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "METUCom",
-  description: "Discover and join university clubs and events at METU.",
+  description:
+    "Discover and join university clubs and events at METU.",
 };
 
 export default function RootLayout({
@@ -26,10 +27,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-white text-gray-900 antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-white text-gray-800 antialiased`}
       >
         <Navbar />
-        <main className="pb-16">{children}</main>
+        <main>{children}</main>
       </body>
     </html>
   );

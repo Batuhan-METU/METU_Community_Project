@@ -15,16 +15,14 @@ export default function ProfilePage() {
   );
 
   return (
-    <div className="mx-auto max-w-5xl px-6 py-10">
-      <section className="rounded-lg border border-gray-200 bg-white p-6">
+    <div className="mx-auto max-w-5xl px-6 py-12">
+      <section className="border-b border-gray-200 pb-8">
         <div className="flex items-center gap-4">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 text-base font-semibold text-gray-600">
             BK
           </div>
           <div>
-            <h1 className="text-xl font-semibold text-gray-900">
-              Batuhan Kaya
-            </h1>
+            <h1 className="text-xl font-bold text-gray-900">Batuhan Kaya</h1>
             <p className="mt-0.5 text-sm text-gray-500">
               Computer engineering student exploring clubs, workshops, and
               events across campus.
@@ -34,8 +32,8 @@ export default function ProfilePage() {
       </section>
 
       <section className="mt-10">
-        <h2 className="text-lg font-semibold text-gray-900">Joined Events</h2>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <h2 className="text-lg font-bold text-gray-900">Joined Events</h2>
+        <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {joinedEvents.map((event) => (
             <EventCard
               key={event.id}
@@ -53,10 +51,8 @@ export default function ProfilePage() {
       </section>
 
       <section className="mt-10">
-        <h2 className="text-lg font-semibold text-gray-900">
-          Interested Clubs
-        </h2>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <h2 className="text-lg font-bold text-gray-900">Interested Clubs</h2>
+        <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {interestedClubs.map((club) => (
             <ClubCard
               key={club.id}

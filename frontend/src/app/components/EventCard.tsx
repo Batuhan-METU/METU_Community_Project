@@ -37,10 +37,10 @@ export default function EventCard({
 
   return (
     <Link href={`/events/${id}`} className="group block h-full">
-      <article className="flex h-full flex-col justify-between rounded-md border border-gray-200 bg-white p-4 transition-colors hover:border-gray-300 hover:bg-gray-50/30">
-        <div className="space-y-3">
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-xs font-medium tracking-wide text-gray-400">{club}</p>
+      <article className="flex h-full flex-col justify-between rounded-md border border-gray-200 bg-white p-4 transition-colors duration-200 hover:border-gray-300">
+        <div className="space-y-2.5">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-medium text-gray-400">{club}</p>
             {joined && (
               <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
                 Joined
@@ -50,13 +50,11 @@ export default function EventCard({
           <h3 className="line-clamp-2 text-base font-semibold leading-snug text-gray-900">
             {title}
           </h3>
-          <div className="space-y-1 text-sm text-gray-500">
-            <p>
-              {formattedDate}, {formattedTime}
-            </p>
-            <p>{location}</p>
-          </div>
-          <div className="pt-0.5">
+          <p className="text-sm text-gray-500">
+            {formattedDate}, {formattedTime}
+          </p>
+          <p className="text-sm text-gray-400">{location}</p>
+          <div className="pt-1.5">
             <div className="flex items-center justify-between text-xs text-gray-400">
               <span>
                 {filledSeats}/{totalSeats} seats
@@ -65,16 +63,15 @@ export default function EventCard({
             </div>
             <div className="mt-1.5 h-1 w-full rounded-full bg-gray-100">
               <div
-                className="h-full rounded-full bg-gray-900 transition-all duration-500"
+                className="h-full rounded-full bg-gray-800 transition-all duration-500"
                 style={{ width: `${capacityPercent}%` }}
               />
             </div>
           </div>
         </div>
-
-        <div className="mt-4 border-t border-gray-100 pt-3 text-center text-sm font-medium text-gray-500 transition-colors group-hover:text-gray-800">
+        <p className="mt-4 border-t border-gray-100 pt-3 text-sm font-medium text-gray-400 transition-colors group-hover:text-gray-700">
           View details &rarr;
-        </div>
+        </p>
       </article>
     </Link>
   );

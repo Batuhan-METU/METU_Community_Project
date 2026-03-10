@@ -38,50 +38,54 @@ export default async function EventDetailPage({
     <div className="mx-auto max-w-2xl px-6 py-12">
       <Link
         href="/events"
-        className="text-sm text-gray-400 hover:text-gray-700"
+        className="text-sm text-neutral-500 transition-colors hover:text-indigo-400"
       >
         &larr; Back to events
       </Link>
 
-      <article className="mt-8">
-        <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+      <article className="mt-8 rounded-2xl bg-neutral-900 p-6 ring-1 ring-neutral-800 md:p-8">
+        <div className="relative mb-6 h-48 overflow-hidden rounded-xl">
+          <div className="h-full w-full bg-gradient-to-br from-indigo-500 via-fuchsia-500 to-orange-400" />
+        </div>
+
+        <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
           {event.club}
         </p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight text-gray-900">
+        <h1 className="mt-2 text-3xl font-bold tracking-tight text-white">
           {event.title}
         </h1>
 
-        <dl className="mt-8 grid gap-px overflow-hidden rounded-md border border-gray-200 bg-gray-200 text-sm sm:grid-cols-2">
-          <div className="bg-white p-4">
-            <dt className="text-xs font-medium uppercase tracking-wide text-gray-400">
+        <div className="mt-6 grid gap-px overflow-hidden rounded-xl bg-neutral-800 text-sm sm:grid-cols-2">
+          <div className="bg-neutral-900 p-4">
+            <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
               Date &amp; Time
-            </dt>
-            <dd className="mt-1 text-gray-700">
+            </p>
+            <p className="mt-1 text-neutral-200">
               {formattedDate}, {formattedTime}
-            </dd>
+            </p>
           </div>
-          <div className="bg-white p-4">
-            <dt className="text-xs font-medium uppercase tracking-wide text-gray-400">
+          <div className="bg-neutral-900 p-4">
+            <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
               Location
-            </dt>
-            <dd className="mt-1 text-gray-700">{event.location}</dd>
+            </p>
+            <p className="mt-1 text-neutral-200">{event.location}</p>
           </div>
-        </dl>
+        </div>
 
-        <p className="mt-8 text-base leading-7 text-gray-600">
+        <p className="mt-6 text-base leading-7 text-neutral-400">
           {event.description}
         </p>
 
-        <div className="mt-8">
-          <div className="flex items-center justify-between text-xs text-gray-400">
+        <div className="mt-6">
+          <div className="flex items-center justify-between text-xs text-neutral-500">
             <span>Capacity</span>
             <span>
               {event.filledSeats}/{event.totalSeats} seats
             </span>
           </div>
-          <div className="mt-1.5 h-1.5 w-full rounded-full bg-gray-100">
+          <div className="mt-1.5 h-1.5 w-full rounded-full bg-neutral-800">
             <div
-              className="h-full rounded-full bg-gray-800 transition-all duration-500"
+              className="h-full rounded-full bg-indigo-500 transition-all duration-500"
               style={{ width: `${capacityPercent}%` }}
             />
           </div>

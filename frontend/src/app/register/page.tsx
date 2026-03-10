@@ -3,11 +3,11 @@ import Link from "next/link";
 export default function RegisterPage() {
   return (
     <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-5xl items-center justify-center px-6 py-10">
-      <div className="w-full max-w-md rounded-lg border border-gray-200 bg-white p-6 sm:p-8">
-        <h1 className="text-2xl font-semibold tracking-tight text-gray-900">
+      <div className="w-full max-w-sm rounded-2xl bg-neutral-900 p-6 ring-1 ring-neutral-800 sm:p-8">
+        <h1 className="text-xl font-bold tracking-tight text-white">
           Create your METUCom account
         </h1>
-        <p className="mt-2 text-sm text-gray-500">
+        <p className="mt-2 text-sm text-neutral-400">
           Join clubs, discover events, and build your campus profile
         </p>
 
@@ -15,7 +15,7 @@ export default function RegisterPage() {
           <div>
             <label
               htmlFor="name"
-              className="mb-1.5 block text-sm font-medium text-gray-700"
+              className="mb-1.5 block text-xs font-medium text-neutral-400"
             >
               Name
             </label>
@@ -25,14 +25,14 @@ export default function RegisterPage() {
               type="text"
               autoComplete="name"
               placeholder="Your full name"
-              className="w-full rounded-md border border-gray-200 bg-white px-3.5 py-2 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-400 focus:border-gray-400 focus:ring-1 focus:ring-gray-400"
+              className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3.5 py-2 text-sm text-neutral-200 outline-none placeholder:text-neutral-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
             />
           </div>
 
           <div>
             <label
               htmlFor="email"
-              className="mb-1.5 block text-sm font-medium text-gray-700"
+              className="mb-1.5 block text-xs font-medium text-neutral-400"
             >
               Email
             </label>
@@ -42,14 +42,14 @@ export default function RegisterPage() {
               type="email"
               autoComplete="email"
               placeholder="you@metu.edu.tr"
-              className="w-full rounded-md border border-gray-200 bg-white px-3.5 py-2 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-400 focus:border-gray-400 focus:ring-1 focus:ring-gray-400"
+              className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3.5 py-2 text-sm text-neutral-200 outline-none placeholder:text-neutral-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
             />
           </div>
 
           <div>
             <label
               htmlFor="password"
-              className="mb-1.5 block text-sm font-medium text-gray-700"
+              className="mb-1.5 block text-xs font-medium text-neutral-400"
             >
               Password
             </label>
@@ -59,14 +59,14 @@ export default function RegisterPage() {
               type="password"
               autoComplete="new-password"
               placeholder="Create a password"
-              className="w-full rounded-md border border-gray-200 bg-white px-3.5 py-2 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-400 focus:border-gray-400 focus:ring-1 focus:ring-gray-400"
+              className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3.5 py-2 text-sm text-neutral-200 outline-none placeholder:text-neutral-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
             />
           </div>
 
           <div>
             <label
               htmlFor="confirm-password"
-              className="mb-1.5 block text-sm font-medium text-gray-700"
+              className="mb-1.5 block text-xs font-medium text-neutral-400"
             >
               Confirm Password
             </label>
@@ -76,23 +76,23 @@ export default function RegisterPage() {
               type="password"
               autoComplete="new-password"
               placeholder="Re-enter your password"
-              className="w-full rounded-md border border-gray-200 bg-white px-3.5 py-2 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-400 focus:border-gray-400 focus:ring-1 focus:ring-gray-400"
+              className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3.5 py-2 text-sm text-neutral-200 outline-none placeholder:text-neutral-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
             />
           </div>
 
           <button
             type="submit"
-            className="mt-2 w-full rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800"
+            className="mt-2 w-full rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
           >
             Register
           </button>
         </form>
 
-        <p className="mt-5 text-sm text-gray-500">
+        <p className="mt-5 text-center text-sm text-neutral-500">
           Already have an account?{" "}
           <Link
             href="/login"
-            className="font-medium text-gray-900 underline underline-offset-2 transition-colors hover:text-gray-700"
+            className="font-medium text-indigo-400 hover:text-indigo-300"
           >
             Back to Login
           </Link>

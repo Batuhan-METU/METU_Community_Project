@@ -28,54 +28,54 @@ export default async function ClubDetailPage({ params }: ClubDetailPageProps) {
     <div className="mx-auto max-w-5xl px-6 py-12">
       <Link
         href="/clubs"
-        className="text-sm text-gray-400 hover:text-gray-700"
+        className="text-sm text-neutral-500 transition-colors hover:text-indigo-400"
       >
         &larr; Back to clubs
       </Link>
 
-      <article className="mt-8">
+      <article className="mt-8 rounded-2xl bg-neutral-900 p-6 ring-1 ring-neutral-800 md:p-8">
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-md bg-gray-100 text-base font-semibold text-gray-600">
+          <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 text-lg font-bold text-white">
             {club.name.charAt(0)}
           </div>
           <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+            <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
               {club.category}
             </p>
-            <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+            <h1 className="text-2xl font-bold tracking-tight text-white">
               {club.name}
             </h1>
           </div>
         </div>
 
-        <p className="mt-6 text-base leading-7 text-gray-600">
+        <p className="mt-6 text-base leading-7 text-neutral-400">
           {club.description}
         </p>
 
-        <dl className="mt-6 grid gap-px overflow-hidden rounded-md border border-gray-200 bg-gray-200 text-sm sm:grid-cols-2">
-          <div className="bg-white p-4">
-            <dt className="text-xs font-medium uppercase tracking-wide text-gray-400">
+        <div className="mt-6 grid gap-px overflow-hidden rounded-xl bg-neutral-800 text-sm sm:grid-cols-2">
+          <div className="bg-neutral-900 p-4">
+            <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
               Category
-            </dt>
-            <dd className="mt-1 text-gray-700">{club.category}</dd>
+            </p>
+            <p className="mt-1 text-neutral-200">{club.category}</p>
           </div>
-          <div className="bg-white p-4">
-            <dt className="text-xs font-medium uppercase tracking-wide text-gray-400">
+          <div className="bg-neutral-900 p-4">
+            <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
               Total Events
-            </dt>
-            <dd className="mt-1 text-gray-700">{club.numberOfEvents}</dd>
+            </p>
+            <p className="mt-1 text-neutral-200">{club.numberOfEvents}</p>
           </div>
-        </dl>
+        </div>
       </article>
 
       <section className="mt-12">
-        <h2 className="text-xl font-bold tracking-tight text-gray-900">
+        <h2 className="text-xl font-bold tracking-tight text-white">
           Club Events
         </h2>
 
         {isLoggedIn ? (
           <>
-            <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {clubEvents.map((event) => (
                 <EventCard
                   key={event.id}
@@ -91,19 +91,19 @@ export default async function ClubDetailPage({ params }: ClubDetailPageProps) {
             </div>
 
             {clubEvents.length === 0 && (
-              <p className="mt-4 text-sm text-gray-400">
+              <p className="mt-6 text-sm text-neutral-500">
                 No events are available for this club yet.
               </p>
             )}
           </>
         ) : (
-          <div className="mt-6 rounded-md border border-gray-200 bg-gray-50 p-5">
-            <p className="text-sm text-gray-600">
+          <div className="mt-6 rounded-xl bg-neutral-900 p-6 ring-1 ring-neutral-800">
+            <p className="text-sm text-neutral-400">
               Login to see upcoming events
             </p>
             <Link
               href="/login"
-              className="mt-3 inline-block rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800"
+              className="mt-3 inline-block rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 px-5 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
             >
               Login to explore events
             </Link>

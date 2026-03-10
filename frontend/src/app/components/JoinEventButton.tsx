@@ -6,15 +6,15 @@ export default function JoinEventButton() {
   const [joined, setJoined] = useState(false);
 
   return (
-    <div className="mt-6">
+    <div className="mt-8">
       <button
         type="button"
         onClick={() => setJoined(true)}
         disabled={joined}
-        className={`inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+        className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-300 ${
           joined
-            ? "cursor-default bg-emerald-50 text-emerald-700"
-            : "bg-gray-900 text-white hover:bg-gray-800"
+            ? "cursor-default bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/30"
+            : "bg-gradient-to-r from-indigo-500 to-violet-500 text-white hover:opacity-90"
         }`}
       >
         {joined && (
@@ -41,7 +41,7 @@ export default function JoinEventButton() {
           joined ? "mt-3 max-h-16 opacity-100" : "max-h-0 opacity-0"
         }`}
       >
-        <p className="text-sm text-emerald-600">
+        <p className="text-sm text-emerald-400">
           Successfully joined the event
         </p>
       </div>

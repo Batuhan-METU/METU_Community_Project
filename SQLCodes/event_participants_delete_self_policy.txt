@@ -1,0 +1,20 @@
+-- RLS: EVENT_PARTICIPANTS — Kullanıcılar sadece kendi katılım kayıtlarını silebilsin
+-- Bu script, event_participants tablosu için DELETE politikasını günceller.
+
+-- 1) Tablo için RLS'i aktif et (zaten aktifse sorun olmaz)
+ALTER TABLE public.event_participants ENABLE ROW LEVEL SECURITY;
+
+-- 2) Mevcut DELETE politikasını kaldır
+-- Önceki dosyada politika adı "Users can leave or owner can remove participant" olarak tanımlanmıştı.
+DROP POLICY IF EXISTS "Users can leave or owner can remove participant"
+ON public.event_participants;
+
+-- 3) Sadece kullanıcının kendi kaydını silebildiği yeni DELETE politikası
+CREATE POLICY "Users can delete own participation"
+ON public.event_participants
+FOR DELETE
+TO authenticated
+USING (
+  auth.uid() = user_id
+);
+

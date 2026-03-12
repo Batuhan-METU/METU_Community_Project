@@ -1,8 +1,10 @@
+### --- DEĞİŞKENLER ---
+@baseUrl = http://localhost:8080/api
 @communityId = e772a4d1-98a3-44d9-a1a5-9dad9c5de59e
 
-### Kullanıcı Giriş Testi (Önce buna bas!)
+### 1. ADIM: GİRİŞ YAP (Kimlik Doğrulama)
 # @name login
-POST http://localhost:8080/api/users/login
+POST {{baseUrl}}/users/login
 Content-Type: application/json
 
 {
@@ -10,49 +12,71 @@ Content-Type: application/json
   "password": "Sifre123!"
 }
 
-### Token'ı Otomatik Yakala (Kritik Satır!)
+### Token'ı Otomatik Yakala
 @authToken = {{login.response.body.session.access_token}}
 
-### Korumalı Topluluk Oluşturma Testi (Otomatik Token)
-POST http://localhost:8080/api/communities
+---
+
+### 2. ADIM: TEST VERİLERİ OLUŞTURMA (Setup)
+# Farklı tarihlerde ve kategorilerde 2 etkinlik ekliyoruz.
+
+### A. Gelecek Etkinlik (Teknik)
+POST {{baseUrl}}/events/{{communityId}}
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
 {
-  "name": "METU Motorsport",
-  "description": "Hız ve mühendislik bir arada.",
+  "title": "C++ ile Modern Yazılım",
+  "description": "C++20 standartlarını ODTÜ'de tartışıyoruz.",
+  "starts_at": "2026-05-15T10:00:00Z",
+  "location": "BMB-1",
+  "capacity": 50,
   "category": "Teknik"
 }
 
-### Etkinlik Oluştur (Başarılı - 201 Expected)
-POST http://localhost:8080/api/events/{{communityId}}
+### B. Çok Yakın Etkinlik (Sosyal)
+POST {{baseUrl}}/events/{{communityId}}
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
 {
-  "title": "C++ ile Oyun Geliştirme Workshop",
-  "description": "Unreal Engine temellerini öğreniyoruz. Laptopunuzu getirmeyi unutmayın!",
-  "starts_at": "2026-03-20T18:00:00Z",
-  "location": "METU Teknokent - Co-Working Space",
-  "capacity": 30
+  "title": "Kampüste Kahve Tanışması",
+  "description": "Yazılımcılar arası networking ve kahve.",
+  "starts_at": "2026-04-01T14:00:00Z",
+  "location": "Çarşı A4",
+  "capacity": 20,
+  "category": "Sosyal"
 }
 
-### 1. Etkinlikleri Listele (Katılacağımız Etkinliğin ID'sini Buradan Alacağız)
-# @name listEvents
-GET http://localhost:8080/api/events
+
+### 3. ADIM: 1.5 KEŞFETME VE ARAMA TESTLERİ
+
+### TEST 3.1: Metin Araması (ILIKE Kontrolü)
+# "c++" küçük harf yazsak bile "C++ ile Modern Yazılım" gelmeli.
+GET {{baseUrl}}/events/search?q=c%2B%2B
 Authorization: Bearer {{authToken}}
 
-### Değişken Tanımlama (listEvents cevabındaki ilk id'yi alır)
+### TEST 3.2: Kategori Filtreleme
+# Sadece "Teknik" olanları getirmeli.
+GET {{baseUrl}}/events/filter?category=Teknik
+Authorization: Bearer {{authToken}}
+
+### TEST 3.3: Tarih Sıralama (En Önemlisi!)
+# Bu istekte "Kampüste Kahve" (Nisan), "C++" (Mayıs) etkinliğinden önce gelmeli.
+# @name listEvents
+GET {{baseUrl}}/events
+Authorization: Bearer {{authToken}}
+
+### TEST 3.4: Topluluk Arama
+GET {{baseUrl}}/communities/search?q=Motorsport
+Authorization: Bearer {{authToken}}
+
+---
+
+### 4. ADIM: KATILIM VE DOLULUK TESTİ (1.4 Hatırlatması)
+# Önce listeleme yapıp bir eventId almalısın.
 @eventId = {{listEvents.response.body.0.id}}
 
-### 2. Etkinliğe Katıl (İlk Sefer - 201 Expected)
-POST http://localhost:8080/api/events/join/{{eventId}}
-Authorization: Bearer {{authToken}}
-
-### 3. Tekrar Katılmayı Dene (Hata Testi - 409 Expected)
-POST http://localhost:8080/api/events/join/{{eventId}}
-Authorization: Bearer {{authToken}}
-
-### 4. Etkinlik Katılımcılarını Gör (200 Expected)
-GET http://localhost:8080/api/events/participants/{{eventId}}
+### Etkinliğe Katıl
+POST {{baseUrl}}/events/join/{{eventId}}
 Authorization: Bearer {{authToken}}

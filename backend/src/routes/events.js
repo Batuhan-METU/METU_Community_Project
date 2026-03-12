@@ -6,16 +6,91 @@ const authMiddleware = require('../middleware/auth');
 // GET /api/events — tüm etkinlikleri listele (herkese açık)
 router.get('/', async (req, res) => {
   try {
+    const nowIso = new Date().toISOString();
+
     const { data, error } = await supabase
       .from('events')
       .select('*')
+      .gt('starts_at', nowIso)
       .order('starts_at', { ascending: true });
 
     if (error) throw error;
 
-    res.json(data);
+    res.json(data || []);
   } catch (error) {
     res.status(500).json({ error: 'Etkinlikler getirilemedi.' });
+  }
+});
+
+// GET /api/events/search — başlık ve açıklamada arama (herkese açık)
+router.get('/search', async (req, res) => {
+  const { q } = req.query;
+
+  if (!q || !q.trim()) {
+    return res.status(400).json({ error: 'Arama terimi (q) gereklidir.' });
+  }
+
+  try {
+    const nowIso = new Date().toISOString();
+    const searchPattern = `%${q.trim()}%`;
+
+    const { data, error } = await supabase
+      .from('events')
+      .select('*')
+      .or(`title.ilike.${searchPattern},description.ilike.${searchPattern}`)
+      .gt('starts_at', nowIso)
+      .order('starts_at', { ascending: true });
+
+    if (error) throw error;
+
+    res.json(data || []);
+  } catch (error) {
+    res.status(500).json({ error: 'Etkinlik araması gerçekleştirilemedi.' });
+  }
+});
+
+// GET /api/events/filter — kategori ve/veya tarihe göre filtreleme (herkese açık)
+router.get('/filter', async (req, res) => {
+  const rawCategory = typeof req.query.category === 'string' ? req.query.category.trim() : '';
+  const rawStartsAt = typeof req.query.starts_at === 'string' ? req.query.starts_at.trim() : '';
+
+  const hasCategory = !!rawCategory;
+  const hasStartsAt = !!rawStartsAt;
+
+  if (!hasCategory && !hasStartsAt) {
+    return res
+      .status(400)
+      .json({ error: 'En az bir filtre parametresi (category veya starts_at) gereklidir.' });
+  }
+
+  try {
+    // Not: events tablosunda category kolonu yok, kategori bilgisi communities.category’de.
+    // Bu yüzden Supabase relationship üzerinden communities ile join yapıyoruz.
+    let selectClause = '*';
+    if (hasCategory) {
+      selectClause = '*, communities!inner(category)';
+    }
+
+    const nowIso = new Date().toISOString();
+
+    let query = supabase.from('events').select(selectClause).gt('starts_at', nowIso);
+
+    if (hasCategory) {
+      query = query.eq('communities.category', rawCategory);
+    }
+
+    if (hasStartsAt) {
+      query = query.gte('starts_at', rawStartsAt);
+    }
+
+    const { data, error } = await query.order('starts_at', { ascending: true });
+
+    if (error) throw error;
+
+    res.json(data || []);
+  } catch (error) {
+    console.error('Filtreleme Hatası:', error);
+    res.status(500).json({ error: 'Etkinlikler filtrelenemedi.' });
   }
 });
 

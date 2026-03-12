@@ -18,6 +18,30 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET /api/communities/search — topluluk ismi ve açıklamasında arama (herkese açık)
+router.get('/search', async (req, res) => {
+  const { q } = req.query;
+
+  if (!q || !q.trim()) {
+    return res.status(400).json({ error: 'Arama terimi (q) gereklidir.' });
+  }
+
+  try {
+    const searchPattern = `%${q.trim()}%`;
+
+    const { data, error } = await supabase
+      .from('communities')
+      .select('*')
+      .or(`name.ilike.${searchPattern},description.ilike.${searchPattern}`);
+
+    if (error) throw error;
+
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Topluluk araması gerçekleştirilemedi.' });
+  }
+});
+
 // POST /api/communities — sadece giriş yapmış kullanıcılar
 router.post('/', authMiddleware, async (req, res) => {
   try {

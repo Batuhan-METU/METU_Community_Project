@@ -80,3 +80,43 @@ Authorization: Bearer {{authToken}}
 ### Etkinliğe Katıl
 POST {{baseUrl}}/events/join/{{eventId}}
 Authorization: Bearer {{authToken}}
+
+### --- 1.6 KİŞİSEL DASHBOARD TESTLERİ ---
+
+### 1. Benim Profil Bilgilerim
+# Beklenen: Senin ismin, emailin ve id bilgin.
+GET {{baseUrl}}/me/profile
+Authorization: Bearer {{authToken}}
+
+---
+
+### 2. Katıldığım Etkinlikler
+# Beklenen: 'Katıl' dediğin etkinliklerin listesi ve detayları.
+GET {{baseUrl}}/me/events
+Authorization: Bearer {{authToken}}
+
+---
+
+### 3. Sahibi Olduğum Topluluklar
+# Beklenen: Senin kurduğun (created_by) toplulukların listesi.
+GET {{baseUrl}}/me/communities
+Authorization: Bearer {{authToken}}
+
+### --- 1.6.2 FİNAL DOKUNUŞLARI TESTLERİ ---
+
+### 1. Profil İsmini Güncelle
+# Beklenen: İsminin değişmesi ve 200 OK.
+PUT {{baseUrl}}/me/profile
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "full_name": "Tayanç Daloğlu (Updated)"
+}
+
+
+### 2. Etkinlikten Ayrıl (Vazgeç)
+# Beklenen: Katılımın silinmesi ve 200 OK.
+# @eventId değerini daha önceki listeleme testinden aldığını varsayıyoruz.
+DELETE {{baseUrl}}/me/events/{{eventId}}
+Authorization: Bearer {{authToken}}

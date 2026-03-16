@@ -120,3 +120,44 @@ Authorization: Bearer {{authToken}}
 # @eventId değerini daha önceki listeleme testinden aldığını varsayıyoruz.
 DELETE {{baseUrl}}/me/events/{{eventId}}
 Authorization: Bearer {{authToken}}
+
+### --- 1.7 GÖRSEL YÜKLEME TESTLERİ ---
+
+### 1. Profil Fotoğrafı Yükle
+POST {{baseUrl}}/upload/profile
+Authorization: Bearer {{authToken}}
+Content-Type: multipart/form-data; boundary=MyBoundary
+
+--MyBoundary
+Content-Disposition: form-data; name="image"; filename="deneme.jpg"
+Content-Type: image/jpeg
+
+< ./deneme.jpg
+--MyBoundary--
+
+### 2. Topluluk Logosu Yükle
+# @communityId değerinin yukarıda tanımlı olduğundan emin ol.
+POST {{baseUrl}}/upload/community/{{communityId}}
+Authorization: Bearer {{authToken}}
+Content-Type: multipart/form-data; boundary=MyBoundary
+
+--MyBoundary
+Content-Disposition: form-data; name="image"; filename="community_logo.jpg"
+Content-Type: image/jpeg
+
+< ./deneme.jpg
+--MyBoundary--
+
+### 3. Etkinlik Kapak Fotoğrafı Yükle
+# listEvents'ten gelen bir id kullanabilirsin.
+@targetEventId = {{listEvents.response.body.0.id}}
+POST {{baseUrl}}/upload/event/{{targetEventId}}
+Authorization: Bearer {{authToken}}
+Content-Type: multipart/form-data; boundary=MyBoundary
+
+--MyBoundary
+Content-Disposition: form-data; name="image"; filename="event_cover.jpg"
+Content-Type: image/jpeg
+
+< ./deneme.jpg
+--MyBoundary--

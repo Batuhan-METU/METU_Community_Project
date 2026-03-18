@@ -228,8 +228,8 @@ router.get('/participants/:event_id', async (req, res) => {
  *         description: Kontenjan dolu
  *       404:
  *         description: Etkinlik bulunamadı
- *       409:
- *         description: Zaten kayıtlı
+ *       400:
+ *         description: Zaten katıldınız
  *       500:
  *         description: Sunucu hatası
  */
@@ -248,7 +248,7 @@ router.post('/join/:event_id', authMiddleware, async (req, res) => {
     if (existingError) throw existingError;
 
     if (existing) {
-      return res.status(409).json({ error: 'Bu etkinliğe zaten kayıtlısınız.' });
+      return res.status(400).json({ error: 'Zaten katıldınız' });
     }
 
     const { data: event, error: eventError } = await supabase
@@ -290,6 +290,72 @@ router.post('/join/:event_id', authMiddleware, async (req, res) => {
     res.status(201).json(data);
   } catch (err) {
     res.status(500).json({ error: 'Etkinliğe kayıt yapılamadı.' });
+  }
+});
+
+/**
+ * @openapi
+ * /api/events/leave/{event_id}:
+ *   delete:
+ *     tags: [Events]
+ *     summary: Kullanıcının bir etkinlikten ayrılması
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: event_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Ayrılındı
+ *       401:
+ *         description: Yetkisiz
+ *       404:
+ *         description: Katılım bulunamadı
+ *       500:
+ *         description: Sunucu hatası
+ */
+// DELETE /api/events/leave/:event_id — kullanıcının bir etkinlikten ayrılması
+router.delete('/leave/:event_id', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    const { event_id } = req.params;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Yetkisiz erişim. Kullanıcı bulunamadı.' });
+    }
+    if (!event_id) {
+      return res.status(400).json({ error: 'Etkinlik ID bilgisi gereklidir.' });
+    }
+
+    const { data: existing, error: existingError } = await supabase
+      .from('event_participants')
+      .select('id')
+      .eq('event_id', event_id)
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (existingError) throw existingError;
+
+    if (!existing) {
+      return res.status(404).json({ error: 'Bu etkinliğe katılımınız bulunamadı.' });
+    }
+
+    const { error: deleteError } = await supabase
+      .from('event_participants')
+      .delete()
+      .eq('event_id', event_id)
+      .eq('user_id', userId);
+
+    if (deleteError) {
+      return res.status(500).json({ error: 'Etkinlikten ayrılınamadı.' });
+    }
+
+    return res.json({ message: 'Etkinlikten ayrıldınız.' });
+  } catch (err) {
+    return res.status(500).json({ error: 'Etkinlikten ayrılınamadı.' });
   }
 });
 

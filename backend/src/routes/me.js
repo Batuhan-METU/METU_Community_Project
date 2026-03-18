@@ -20,7 +20,7 @@ router.get('/profile', async (req, res) => {
     // full_name bilgisi public.profiles tablosunda tutuluyor
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('full_name')
+      .select('full_name, avatar_url')
       .eq('id', authUser.id)
       .maybeSingle();
 
@@ -32,6 +32,7 @@ router.get('/profile', async (req, res) => {
       id: authUser.id,
       email: authUser.email,
       full_name: profile ? profile.full_name : null,
+      avatar_url: profile ? profile.avatar_url : null,
     });
   } catch (error) {
     return res.status(500).json({ error: 'Profil bilgileri alınırken bir hata oluştu.' });

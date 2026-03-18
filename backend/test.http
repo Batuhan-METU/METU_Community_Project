@@ -81,6 +81,10 @@ Authorization: Bearer {{authToken}}
 POST {{baseUrl}}/events/join/{{eventId}}
 Authorization: Bearer {{authToken}}
 
+### Aynı Etkinliğe Tekrar Katıl (400: Zaten katıldınız)
+POST {{baseUrl}}/events/join/{{eventId}}
+Authorization: Bearer {{authToken}}
+
 ### --- 1.6 KİŞİSEL DASHBOARD TESTLERİ ---
 
 ### 1. Benim Profil Bilgilerim

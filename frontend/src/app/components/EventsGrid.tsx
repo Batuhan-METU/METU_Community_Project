@@ -24,6 +24,7 @@ export default function EventsGrid({ events }: EventsGridProps) {
           community={event.community}
           date={event.date}
           location={event.location}
+          imageUrl={event.imageUrl}
           filledSeats={event.filledSeats}
           totalSeats={event.totalSeats}
         />

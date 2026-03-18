@@ -1,6 +1,57 @@
-import Link from "next/link";
+"use client";
 
-export default function RegisterPage() {
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import axiosClient from "@/api/axios";
+
+ export default function RegisterPage() {
+   const router = useRouter();
+
+   const [fullName, setFullName] = useState("");
+   const [email, setEmail] = useState("");
+   const [password, setPassword] = useState("");
+   const [confirmPassword, setConfirmPassword] = useState("");
+   const [loading, setLoading] = useState(false);
+   const [error, setError] = useState<string | null>(null);
+
+   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
+     e.preventDefault();
+     setError(null);
+     setLoading(true);
+
+     try {
+       if (!fullName || !email || !password) {
+         throw new Error("Tüm alanları doldurmalısın.");
+       }
+       if (password !== confirmPassword) {
+         throw new Error("Şifreler eşleşmiyor.");
+       }
+
+       await axiosClient.post("/users/register", {
+         email,
+         password,
+         full_name: fullName,
+       });
+
+       alert("Kayıt başarılı! Lütfen giriş yap.");
+       router.push("/login");
+     } catch (err: unknown) {
+       const e = err as {
+         response?: { data?: { error?: string }; status?: number };
+         message?: string;
+       };
+       const message =
+         e?.response?.data?.error ||
+         e?.message ||
+         "Kayıt yapılamadı. Lütfen tekrar deneyin.";
+       setError(message);
+       alert(message);
+     } finally {
+       setLoading(false);
+     }
+   };
+
   return (
     <div className="relative flex min-h-screen w-full items-center justify-center">
       <div
@@ -18,7 +69,7 @@ export default function RegisterPage() {
             Join communities, discover events, and build your campus profile
           </p>
 
-          <form className="mt-6 space-y-4">
+          <form onSubmit={handleRegister} className="mt-6 space-y-4">
             <div>
               <label
                 htmlFor="name"
@@ -32,6 +83,8 @@ export default function RegisterPage() {
                 type="text"
                 autoComplete="name"
                 placeholder="Your full name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
                 className="w-full rounded-lg border border-gray-300 bg-white/80 px-4 py-2 text-sm text-gray-900 outline-none placeholder:text-gray-500 focus:ring-2 focus:ring-white"
               />
             </div>
@@ -49,6 +102,8 @@ export default function RegisterPage() {
                 type="email"
                 autoComplete="email"
                 placeholder="you@metu.edu.tr"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full rounded-lg border border-gray-300 bg-white/80 px-4 py-2 text-sm text-gray-900 outline-none placeholder:text-gray-500 focus:ring-2 focus:ring-white"
               />
             </div>
@@ -66,6 +121,8 @@ export default function RegisterPage() {
                 type="password"
                 autoComplete="new-password"
                 placeholder="Create a password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full rounded-lg border border-gray-300 bg-white/80 px-4 py-2 text-sm text-gray-900 outline-none placeholder:text-gray-500 focus:ring-2 focus:ring-white"
               />
             </div>
@@ -83,6 +140,8 @@ export default function RegisterPage() {
                 type="password"
                 autoComplete="new-password"
                 placeholder="Re-enter your password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 className="w-full rounded-lg border border-gray-300 bg-white/80 px-4 py-2 text-sm text-gray-900 outline-none placeholder:text-gray-500 focus:ring-2 focus:ring-white"
               />
             </div>
@@ -90,10 +149,15 @@ export default function RegisterPage() {
             <button
               type="submit"
               className="mt-2 w-full rounded-full bg-white px-6 py-3 text-sm font-medium text-black transition hover:bg-gray-200"
+              disabled={loading}
             >
-              Register
+              {loading ? "Kayıt yapılıyor..." : "Register"}
             </button>
           </form>
+
+          {error && (
+            <p className="mt-3 text-center text-sm text-red-200">{error}</p>
+          )}
 
           <p className="mt-5 text-center text-sm text-white/90">
             Already have an account?{" "}

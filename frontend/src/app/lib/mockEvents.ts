@@ -6,13 +6,14 @@ export type EventCategory =
   | "Science";
 
 export type MockEvent = {
-  id: number;
+  id: string | number;
   title: string;
   community: string;
   date: string;
   location: string;
+  imageUrl?: string | null;
   description: string;
-  category: EventCategory;
+  category?: EventCategory;
   filledSeats: number;
   totalSeats: number;
 };

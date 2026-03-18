@@ -9,7 +9,14 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    maxAge: 86400,
+  })
+);
 app.use(express.json());
 
 // Basit health check
@@ -47,12 +54,14 @@ const eventsRouter = require("./src/routes/events");
 const usersRouter = require("./src/routes/users");
 const meRouter = require("./src/routes/me");
 const uploadRouter = require("./src/routes/upload");
+const adminRouter = require("./src/routes/admin");
 
 app.use("/api/communities", communitiesRouter);
 app.use("/api/events", eventsRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/me", meRouter);
 app.use("/api/upload", uploadRouter);
+app.use("/api/admin", adminRouter);
 
 app.listen(PORT, () => {
   console.log(`METUHub API http://localhost:${PORT} adresinde çalışıyor.`);

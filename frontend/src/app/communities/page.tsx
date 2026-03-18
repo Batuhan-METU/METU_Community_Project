@@ -1,7 +1,16 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { mockCommunities } from "../lib/mockCommunities";
+import axiosClient from "@/api/axios";
+import CommunityCard from "../components/CommunityCard";
+
+type ApiCommunity = {
+  id: string | number;
+  name: string;
+  description?: string | null;
+  logo_url?: string | null;
+};
 
 const LOGOS = [
   "/images/community-logos/edt.png",
@@ -11,6 +20,43 @@ const LOGOS = [
 ];
 
 export default function CommunitiesPage() {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [communities, setCommunities] = useState<ApiCommunity[]>([]);
+
+  useEffect(() => {
+    let alive = true;
+
+    axiosClient
+      .get("/communities")
+      .then((r) => {
+        if (!alive) return;
+        setCommunities(r.data || []);
+      })
+      .catch((e: unknown) => {
+        if (!alive) return;
+        const err = e as {
+          response?: { status?: number; data?: { error?: string } };
+          message?: string;
+        };
+        const status = err?.response?.status;
+        if (status === 401) alert("Lütfen giriş yapın.");
+        setError(
+          err?.response?.data?.error ||
+            err?.message ||
+            "Topluluklar alınamadı."
+        );
+      })
+      .finally(() => {
+        if (!alive) return;
+        setLoading(false);
+      });
+
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-white">
       {/* Hero with video background */}
@@ -73,36 +119,25 @@ export default function CommunitiesPage() {
         <h2 className="mb-8 text-2xl font-semibold tracking-tight text-gray-900">
           Communities
         </h2>
-        <div className="grid gap-8 md:grid-cols-3">
-          {mockCommunities.map((community) => (
-            <article
-              key={community.id}
-              className="overflow-hidden rounded-xl bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
-            >
-              <Link href={`/communities/${community.id}`} className="block">
-                <div className="relative h-40 overflow-hidden rounded-lg bg-gradient-to-br from-gray-200 to-gray-300">
-                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-400/80 via-purple-400/80 to-pink-400/80" />
-                </div>
-                <h3 className="mt-4 text-lg font-semibold text-gray-900">
-                  {community.name}
-                </h3>
-                <p className="mt-2 line-clamp-2 text-sm text-gray-600">
-                  {community.description}
-                </p>
-                <p className="mt-3 text-xs text-gray-500">
-                  {community.numberOfEvents * 12} members · {community.numberOfEvents}{" "}
-                  events
-                </p>
-              </Link>
-              <Link
-                href={`/communities/${community.id}`}
-                className="mt-4 inline-block rounded-full bg-black px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800"
-              >
-                Join
-              </Link>
-            </article>
-          ))}
-        </div>
+        {loading ? (
+          <p className="py-12 text-center text-sm text-neutral-500">
+            Yükleniyor...
+          </p>
+        ) : error ? (
+          <p className="py-12 text-center text-sm text-red-400">{error}</p>
+        ) : (
+          <div className="grid gap-8 md:grid-cols-3">
+            {communities.map((community) => (
+              <CommunityCard
+                key={String(community.id)}
+                id={community.id}
+                name={community.name}
+                description={community.description || ""}
+                logoUrl={community.logo_url}
+              />
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );

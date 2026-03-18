@@ -1,28 +1,79 @@
 import Link from "next/link";
-import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import EventCard from "../../components/EventCard";
-import { mockCommunities } from "../../lib/mockCommunities";
-import { mockEvents } from "../../lib/mockEvents";
+import type { MockEvent } from "../../lib/mockEvents";
 
 type CommunityDetailPageProps = {
   params: Promise<{ id: string }>;
 };
 
-export default async function CommunityDetailPage({ params }: CommunityDetailPageProps) {
-  const cookieStore = await cookies();
-  const isLoggedIn =
-    cookieStore.get("auth-token")?.value === "logged-in";
-
+export default async function CommunityDetailPage({
+  params,
+}: CommunityDetailPageProps) {
   const { id } = await params;
-  const communityId = Number(id);
-  const community = mockCommunities.find((item) => item.id === communityId);
+  const communityId = id;
+  const API_BASE_URL =
+    process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080/api";
 
-  if (!community) {
+  let communities: unknown;
+  let events: unknown;
+
+  try {
+    const [communitiesRes, eventsRes] = await Promise.all([
+      fetch(`${API_BASE_URL}/communities`),
+      fetch(`${API_BASE_URL}/events`),
+    ]);
+
+    [communities, events] = await Promise.all([
+      communitiesRes.json(),
+      eventsRes.json(),
+    ]);
+  } catch {
     notFound();
   }
 
-  const communityEvents = mockEvents.filter((event) => event.community === community.name);
+  type ApiCommunity = {
+    id: string | number;
+    name: string;
+    description?: string | null;
+    logo_url?: string | null;
+    category?: string | null;
+  };
+
+  type ApiEvent = {
+    id: string | number;
+    community_id: string | number;
+    title: string;
+    starts_at: string;
+    location?: string | null;
+    image_url?: string | null;
+    capacity?: number | null;
+    description?: string | null;
+  };
+
+  const typedCommunities = communities as ApiCommunity[];
+  const typedEvents = events as ApiEvent[];
+
+  const community = typedCommunities.find(
+    (item) => String(item.id) === String(communityId)
+  );
+
+  if (!community) notFound();
+
+  const communityEvents: MockEvent[] = (typedEvents || [])
+    .filter((event) => String(event.community_id) === String(communityId))
+    .map((event) => ({
+      id: event.id,
+      title: event.title,
+      community: community.name,
+      date: event.starts_at,
+      location: event.location || "",
+      imageUrl: event.image_url,
+      filledSeats: 0,
+      totalSeats: typeof event.capacity === "number" ? event.capacity : 0,
+      description: event.description || "",
+      category: undefined,
+    }));
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-12">
@@ -35,8 +86,19 @@ export default async function CommunityDetailPage({ params }: CommunityDetailPag
 
       <article className="mt-8 rounded-2xl bg-neutral-900 p-6 ring-1 ring-neutral-800 md:p-8">
         <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 text-lg font-bold text-white">
-            {community.name.charAt(0)}
+          <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500">
+            {community.logo_url ? (
+              // Supabase public URL zaten doğrudan açılabilir.
+              <img
+                src={community.logo_url}
+                alt={`${community.name} logosu`}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <span className="text-lg font-bold text-white">
+                {community.name.charAt(0)}
+              </span>
+            )}
           </div>
           <div>
             <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
@@ -63,7 +125,7 @@ export default async function CommunityDetailPage({ params }: CommunityDetailPag
             <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
               Total Events
             </p>
-            <p className="mt-1 text-neutral-200">{community.numberOfEvents}</p>
+            <p className="mt-1 text-neutral-200">{communityEvents.length}</p>
           </div>
         </div>
       </article>
@@ -73,41 +135,26 @@ export default async function CommunityDetailPage({ params }: CommunityDetailPag
           Community Events
         </h2>
 
-        {isLoggedIn ? (
-          <>
-            <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {communityEvents.map((event) => (
-                <EventCard
-                  key={event.id}
-                  id={event.id}
-                  title={event.title}
-                  community={event.community}
-                  date={event.date}
-                  location={event.location}
-                  filledSeats={event.filledSeats}
-                  totalSeats={event.totalSeats}
-                />
-              ))}
-            </div>
+        <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {communityEvents.map((event) => (
+            <EventCard
+              key={event.id}
+              id={event.id}
+              title={event.title}
+              community={event.community}
+              date={event.date}
+              location={event.location}
+              imageUrl={event.imageUrl}
+              filledSeats={event.filledSeats}
+              totalSeats={event.totalSeats}
+            />
+          ))}
+        </div>
 
-            {communityEvents.length === 0 && (
-              <p className="mt-6 text-sm text-neutral-500">
-                No events are available for this community yet.
-              </p>
-            )}
-          </>
-        ) : (
-          <div className="mt-6 rounded-xl bg-neutral-900 p-6 ring-1 ring-neutral-800">
-            <p className="text-sm text-neutral-400">
-              Login to see upcoming events
-            </p>
-            <Link
-              href="/login"
-              className="mt-3 inline-block rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 px-5 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
-            >
-              Login to explore events
-            </Link>
-          </div>
+        {communityEvents.length === 0 && (
+          <p className="mt-6 text-sm text-neutral-500">
+            Bu topluluğa ait etkinlik bulunamadı.
+          </p>
         )}
       </section>
     </div>

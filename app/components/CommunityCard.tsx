@@ -14,10 +14,10 @@ export default function CommunityCard({ community }: Props) {
   return (
     <Pressable
       style={styles.wrapper}
-      onPress={() => router.push(`/community/${community.id}`)}>
+      onPress={() => router.push(`/communities/${community.id}`)}>
       {/* Gradient header matching web's emerald→teal→cyan */}
       <LinearGradient
-        colors={[...Gradients.clubCardBg]}
+        colors={[...Gradients.communityCardBg]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.gradientHeader}
@@ -45,8 +45,8 @@ export default function CommunityCard({ community }: Props) {
         </View>
         <Pressable
           style={styles.viewBtn}
-          onPress={() => router.push(`/community/${community.id}`)}>
-          <Text style={styles.viewBtnText}>View Club</Text>
+        onPress={() => router.push(`/communities/${community.id}`)}>
+        <Text style={styles.viewBtnText}>View Community</Text>
         </Pressable>
       </View>
     </Pressable>

@@ -8,7 +8,7 @@ export type EventCategory =
 export type MockEvent = {
   id: number;
   title: string;
-  club: string;
+  community: string;
   date: string;
   location: string;
   description: string;
@@ -21,7 +21,7 @@ export const mockEvents: MockEvent[] = [
   {
     id: 1,
     title: "Spring Coding Challenge Kickoff",
-    club: "METU Computer Society",
+    community: "METU Computer Society",
     date: "2026-03-12T17:30:00",
     location: "Informatics Institute Auditorium",
     description:
@@ -33,7 +33,7 @@ export const mockEvents: MockEvent[] = [
   {
     id: 2,
     title: "Astronomy Night Observation",
-    club: "METU Astronomy Club",
+    community: "METU Astronomy Community",
     date: "2026-03-18T20:00:00",
     location: "Physics Department Roof Terrace",
     description:
@@ -45,7 +45,7 @@ export const mockEvents: MockEvent[] = [
   {
     id: 3,
     title: "Sustainable Campus Workshop",
-    club: "METU Environmental Society",
+    community: "METU Environmental Society",
     date: "2026-03-22T14:00:00",
     location: "Cultural and Convention Center, Hall B",
     description:
@@ -57,7 +57,7 @@ export const mockEvents: MockEvent[] = [
   {
     id: 4,
     title: "Beginner Salsa Social",
-    club: "METU Dance Club",
+    community: "METU Dance Community",
     date: "2026-03-26T19:00:00",
     location: "Student Activities Center Studio 2",
     description:
@@ -69,7 +69,7 @@ export const mockEvents: MockEvent[] = [
   {
     id: 5,
     title: "Indie Game Development Meetup",
-    club: "METU Game Development Community",
+    community: "METU Game Development Community",
     date: "2026-03-30T18:30:00",
     location: "Engineering Faculty, Room E-105",
     description:

@@ -6,6 +6,41 @@ const supabase = require('../config/supabaseClient');
 const authMiddleware = require('../middleware/auth');
 const { uploadToBucket } = require('../services/storageService');
 
+/**
+ * @openapi
+ * tags:
+ *   - name: Upload
+ *     description: Supabase Storage görsel yükleme uçları
+ */
+
+/**
+ * @openapi
+ * /api/upload/profile:
+ *   post:
+ *     tags: [Upload]
+ *     summary: Profil fotoğrafı yükle (profiles.avatar_url)
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Yüklendi
+ *       400:
+ *         description: Hatalı dosya/istek
+ *       401:
+ *         description: Yetkisiz
+ *       500:
+ *         description: Sunucu hatası
+ */
 // Sadece resim türlerine izin ver
 const ALLOWED_MIMES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
@@ -90,6 +125,44 @@ router.post('/profile', singleImage, async (req, res) => {
   }
 });
 
+/**
+ * @openapi
+ * /api/upload/community/{community_id}:
+ *   post:
+ *     tags: [Upload]
+ *     summary: Topluluk logosu yükle (communities.logo_url)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: community_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Yüklendi
+ *       400:
+ *         description: Hatalı dosya/istek
+ *       401:
+ *         description: Yetkisiz
+ *       403:
+ *         description: Yetki yok
+ *       404:
+ *         description: Topluluk bulunamadı
+ *       500:
+ *         description: Sunucu hatası
+ */
 // POST /api/upload/community/:community_id — topluluk logosu; URL communities.logo_url'e yazılır
 router.post('/community/:community_id', singleImage, async (req, res) => {
   try {
@@ -148,6 +221,44 @@ router.post('/community/:community_id', singleImage, async (req, res) => {
   }
 });
 
+/**
+ * @openapi
+ * /api/upload/event/{event_id}:
+ *   post:
+ *     tags: [Upload]
+ *     summary: Etkinlik kapak resmi yükle (events.image_url)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: event_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Yüklendi
+ *       400:
+ *         description: Hatalı dosya/istek
+ *       401:
+ *         description: Yetkisiz
+ *       403:
+ *         description: Yetki yok
+ *       404:
+ *         description: Etkinlik bulunamadı
+ *       500:
+ *         description: Sunucu hatası
+ */
 // POST /api/upload/event/:event_id — etkinlik kapak resmi; URL events.image_url'e yazılır
 router.post('/event/:event_id', singleImage, async (req, res) => {
   try {

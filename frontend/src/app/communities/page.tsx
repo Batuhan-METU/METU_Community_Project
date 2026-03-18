@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { mockClubs } from "../lib/mockClubs";
+import { mockCommunities } from "../lib/mockCommunities";
 
 const LOGOS = [
   "/images/community-logos/edt.png",
@@ -10,7 +10,7 @@ const LOGOS = [
   "/images/community-logos/vt.png",
 ];
 
-export default function ClubsPage() {
+export default function CommunitiesPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero with video background */}
@@ -31,7 +31,7 @@ export default function ClubsPage() {
             Discover Communities at METU
           </h1>
           <p className="mt-4 text-lg text-gray-200">
-            Explore student clubs, connect with communities, and find your people
+            Explore student communities, connect with people, and find your people
             on campus.
           </p>
         </div>
@@ -74,28 +74,28 @@ export default function ClubsPage() {
           Communities
         </h2>
         <div className="grid gap-8 md:grid-cols-3">
-          {mockClubs.map((club) => (
+          {mockCommunities.map((community) => (
             <article
-              key={club.id}
+              key={community.id}
               className="overflow-hidden rounded-xl bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
             >
-              <Link href={`/clubs/${club.id}`} className="block">
+              <Link href={`/communities/${community.id}`} className="block">
                 <div className="relative h-40 overflow-hidden rounded-lg bg-gradient-to-br from-gray-200 to-gray-300">
                   <div className="absolute inset-0 bg-gradient-to-br from-indigo-400/80 via-purple-400/80 to-pink-400/80" />
                 </div>
                 <h3 className="mt-4 text-lg font-semibold text-gray-900">
-                  {club.name}
+                  {community.name}
                 </h3>
                 <p className="mt-2 line-clamp-2 text-sm text-gray-600">
-                  {club.description}
+                  {community.description}
                 </p>
                 <p className="mt-3 text-xs text-gray-500">
-                  {club.numberOfEvents * 12} members · {club.numberOfEvents}{" "}
+                  {community.numberOfEvents * 12} members · {community.numberOfEvents}{" "}
                   events
                 </p>
               </Link>
               <Link
-                href={`/clubs/${club.id}`}
+                href={`/communities/${community.id}`}
                 className="mt-4 inline-block rounded-full bg-black px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800"
               >
                 Join

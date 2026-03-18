@@ -36,7 +36,7 @@ export default function HomeScreen() {
             Discover{'\n'}Communities{'\n'}at METU.
           </Text>
           <Text style={styles.heroDesc}>
-            Explore student clubs, join exciting events, and connect with people who share your
+            Explore student communities, join exciting events, and connect with people who share your
             interests across the METU campus.
           </Text>
           <View style={styles.heroButtons}>
@@ -54,7 +54,7 @@ export default function HomeScreen() {
           <View style={styles.sectionHeader}>
             <View>
               <Text style={styles.sectionTitle}>Upcoming Events</Text>
-              <Text style={styles.sectionSub}>Handpicked events from active student clubs.</Text>
+              <Text style={styles.sectionSub}>Handpicked events from active student communities.</Text>
             </View>
             <Pressable onPress={() => router.push('/events' as any)}>
               <Text style={styles.viewAll}>View all →</Text>

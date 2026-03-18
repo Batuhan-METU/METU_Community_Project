@@ -15,7 +15,7 @@ export default function RegisterPage() {
             Create your METUCom account
           </h1>
           <p className="mt-2 text-sm text-white/90">
-            Join clubs, discover events, and build your campus profile
+            Join communities, discover events, and build your campus profile
           </p>
 
           <form className="mt-6 space-y-4">

@@ -3,6 +3,25 @@ const router = express.Router();
 const supabase = require('../config/supabaseClient');
 const authMiddleware = require('../middleware/auth');
 
+/**
+ * @openapi
+ * tags:
+ *   - name: Events
+ *     description: Etkinlik işlemleri
+ */
+
+/**
+ * @openapi
+ * /api/events:
+ *   get:
+ *     tags: [Events]
+ *     summary: Etkinlikleri listele (gelecek etkinlikler, starts_at ASC)
+ *     responses:
+ *       200:
+ *         description: Etkinlik listesi
+ *       500:
+ *         description: Sunucu hatası
+ */
 // GET /api/events — tüm etkinlikleri listele (herkese açık)
 router.get('/', async (req, res) => {
   try {
@@ -22,6 +41,26 @@ router.get('/', async (req, res) => {
   }
 });
 
+/**
+ * @openapi
+ * /api/events/search:
+ *   get:
+ *     tags: [Events]
+ *     summary: Etkinliklerde arama (title/description, ilike)
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Arama sonuçları
+ *       400:
+ *         description: Arama terimi gerekli
+ *       500:
+ *         description: Sunucu hatası
+ */
 // GET /api/events/search — başlık ve açıklamada arama (herkese açık)
 router.get('/search', async (req, res) => {
   const { q } = req.query;
@@ -49,6 +88,32 @@ router.get('/search', async (req, res) => {
   }
 });
 
+/**
+ * @openapi
+ * /api/events/filter:
+ *   get:
+ *     tags: [Events]
+ *     summary: Etkinlikleri filtrele (community category ve/veya starts_at)
+ *     parameters:
+ *       - in: query
+ *         name: category
+ *         required: false
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: starts_at
+ *         required: false
+ *         schema:
+ *           type: string
+ *           description: ISO datetime (ör. 2026-03-10T00:00:00Z)
+ *     responses:
+ *       200:
+ *         description: Filtre sonuçları
+ *       400:
+ *         description: En az bir filtre gerekli
+ *       500:
+ *         description: Sunucu hatası
+ */
 // GET /api/events/filter — kategori ve/veya tarihe göre filtreleme (herkese açık)
 router.get('/filter', async (req, res) => {
   const rawCategory = typeof req.query.category === 'string' ? req.query.category.trim() : '';
@@ -94,6 +159,24 @@ router.get('/filter', async (req, res) => {
   }
 });
 
+/**
+ * @openapi
+ * /api/events/participants/{event_id}:
+ *   get:
+ *     tags: [Events]
+ *     summary: Etkinlik katılımcılarını listele
+ *     parameters:
+ *       - in: path
+ *         name: event_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Katılımcılar
+ *       500:
+ *         description: Sunucu hatası
+ */
 // GET /api/events/participants/:event_id — etkinliğe kimlerin katıldığını listele (herkese açık)
 router.get('/participants/:event_id', async (req, res) => {
   try {
@@ -112,6 +195,34 @@ router.get('/participants/:event_id', async (req, res) => {
   }
 });
 
+/**
+ * @openapi
+ * /api/events/join/{event_id}:
+ *   post:
+ *     tags: [Events]
+ *     summary: Giriş yapan kullanıcıyı etkinliğe kaydet
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: event_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       201:
+ *         description: Katılım oluşturuldu
+ *       401:
+ *         description: Yetkisiz
+ *       403:
+ *         description: Kontenjan dolu
+ *       404:
+ *         description: Etkinlik bulunamadı
+ *       409:
+ *         description: Zaten kayıtlı
+ *       500:
+ *         description: Sunucu hatası
+ */
 // POST /api/events/join/:event_id — giriş yapan kullanıcıyı etkinliğe kaydet (auth gerekli)
 router.post('/join/:event_id', authMiddleware, async (req, res) => {
   try {

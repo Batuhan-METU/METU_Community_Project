@@ -39,7 +39,7 @@ export default function LoginModal({ open, onClose }: LoginModalProps) {
         </div>
 
         <p className="mt-2 text-sm text-neutral-400">
-          Access events, follow clubs and manage your profile.
+          Access events, follow communities and manage your profile.
         </p>
 
         <form onSubmit={handleSubmit} className="mt-5 space-y-3">

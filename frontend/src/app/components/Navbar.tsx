@@ -22,7 +22,7 @@ export default function Navbar() {
         {/* Center: nav links (desktop) */}
         <nav className="hidden items-center gap-8 text-sm font-medium text-gray-600 md:flex">
           {[
-            { label: "Communities", href: "/clubs" },
+            { label: "Communities", href: "/communities" },
             { label: "Events", href: "/events" },
             { label: "Profiles", href: "/profiles" },
           ].map((item) => {

@@ -45,7 +45,7 @@ export default function EventsPreview() {
                   <h3 className="line-clamp-2 text-lg font-semibold text-gray-900">
                     {event.title}
                   </h3>
-                  <p className="text-sm text-gray-600">{event.club}</p>
+                  <p className="text-sm text-gray-600">{event.community}</p>
                 </div>
                 <div className="mt-4 flex items-center justify-between">
                   <p className="text-xs text-gray-500">

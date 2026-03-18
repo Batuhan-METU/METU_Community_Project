@@ -1,17 +1,17 @@
-import ClubCard from "../components/ClubCard";
+import CommunityCard from "../components/CommunityCard";
 import EventCard from "../components/EventCard";
-import { mockClubs } from "../lib/mockClubs";
+import { mockCommunities } from "../lib/mockCommunities";
 import { mockEvents } from "../lib/mockEvents";
 
 const joinedEventIds = [1, 3, 5];
-const followedClubIds = [1, 3, 5];
+const followedCommunityIds = [1, 3, 5];
 
 export default function ProfilePage() {
   const joinedEvents = mockEvents.filter((event) =>
     joinedEventIds.includes(event.id)
   );
-  const interestedClubs = mockClubs.filter((club) =>
-    followedClubIds.includes(club.id)
+  const interestedCommunities = mockCommunities.filter((community) =>
+    followedCommunityIds.includes(community.id)
   );
 
   return (
@@ -26,7 +26,7 @@ export default function ProfilePage() {
               Batuhan Kaya
             </h1>
             <p className="mt-1 text-sm text-neutral-400">
-              Computer engineering student exploring clubs, workshops, and
+              Computer engineering student exploring communities, workshops, and
               events across campus.
             </p>
           </div>
@@ -43,7 +43,7 @@ export default function ProfilePage() {
               key={event.id}
               id={event.id}
               title={event.title}
-              club={event.club}
+              community={event.community}
               date={event.date}
               location={event.location}
               filledSeats={event.filledSeats}
@@ -56,16 +56,16 @@ export default function ProfilePage() {
 
       <section className="mt-12">
         <h2 className="text-xl font-bold tracking-tight text-white">
-          Interested Clubs
+          Interested Communities
         </h2>
         <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {interestedClubs.map((club) => (
-            <ClubCard
-              key={club.id}
-              id={club.id}
-              name={club.name}
-              description={club.description}
-              eventCount={club.numberOfEvents}
+          {interestedCommunities.map((community) => (
+            <CommunityCard
+              key={community.id}
+              id={community.id}
+              name={community.name}
+              description={community.description}
+              eventCount={community.numberOfEvents}
             />
           ))}
         </div>

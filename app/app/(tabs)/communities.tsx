@@ -33,11 +33,11 @@ export default function CommunitiesScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      {/* Mini hero matching web's clubs page header */}
+      {/* Mini hero matching web's communities page header */}
       <View style={styles.hero}>
         <Text style={styles.heroTitle}>Discover Communities</Text>
         <Text style={styles.heroDesc}>
-          Explore student clubs, connect with communities, and find your people on campus.
+          Explore student communities, connect with people, and find your place on campus.
         </Text>
         <Pressable style={styles.joinBtn}>
           <Text style={styles.joinBtnText}>Join a Community</Text>
@@ -47,7 +47,7 @@ export default function CommunitiesScreen() {
       <View style={styles.listHeader}>
         <Text style={styles.sectionTitle}>Communities</Text>
         <View style={styles.searchWrap}>
-          <SearchInput value={search} onChangeText={setSearch} placeholder="Search clubs..." />
+          <SearchInput value={search} onChangeText={setSearch} placeholder="Search communities..." />
         </View>
       </View>
 

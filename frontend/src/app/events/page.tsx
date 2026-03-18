@@ -19,7 +19,7 @@ export default function EventsPage() {
       const matchesSearch =
         !query ||
         event.title.toLowerCase().includes(query) ||
-        event.club.toLowerCase().includes(query);
+        event.community.toLowerCase().includes(query);
       return matchesCategory && matchesSearch;
     });
   }, [searchText, selectedCategory]);
@@ -30,7 +30,7 @@ export default function EventsPage() {
         All Events
       </h1>
       <p className="mt-2 text-sm text-neutral-500">
-        Find events by club name, category, or topic.
+        Find events by community name, category, or topic.
       </p>
 
       <div className="mt-6 space-y-4">

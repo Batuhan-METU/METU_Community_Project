@@ -1,20 +1,20 @@
 import Link from "next/link";
 
-type ClubCardProps = {
+type CommunityCardProps = {
   id: number;
   name: string;
   description: string;
   eventCount: number;
 };
 
-export default function ClubCard({
+export default function CommunityCard({
   id,
   name,
   description,
   eventCount,
-}: ClubCardProps) {
+}: CommunityCardProps) {
   return (
-    <Link href={`/clubs/${id}`} className="group block h-full">
+    <Link href={`/communities/${id}`} className="group block h-full">
       <article className="flex h-full transform flex-col justify-between overflow-hidden rounded-2xl bg-neutral-900 ring-1 ring-neutral-800 transition-all duration-300 hover:-translate-y-1 hover:ring-neutral-700 hover:shadow-xl hover:shadow-black/50">
         <div className="relative h-32 overflow-hidden rounded-b-none bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500" />
 
@@ -39,7 +39,7 @@ export default function ClubCard({
             type="button"
             className="w-full rounded-full bg-neutral-800 px-4 py-2 text-sm font-medium text-neutral-200 transition-colors hover:bg-neutral-700"
           >
-            View Club
+            View Community
           </button>
         </div>
       </article>

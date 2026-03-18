@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "METUCom",
   description:
-    "Discover and join university clubs and events at METU.",
+    "Discover and join university communities and events at METU.",
 };
 
 export default function RootLayout({

@@ -1,7 +1,7 @@
 const testimonials = [
   {
     name: "Ece, Computer Engineering",
-    department: "AI & Robotics Club",
+    department: "AI & Robotics Community",
     quote:
       "METUCom makes it effortless to discover technical talks and workshops I care about. I check it every week.",
   },
@@ -13,7 +13,7 @@ const testimonials = [
   },
   {
     name: "Zeynep, Business Administration",
-    department: "Entrepreneurship Club",
+    department: "Entrepreneurship Community",
     quote:
       "It feels like a modern startup product built just for our campus. Clean, fast and actually useful.",
   },

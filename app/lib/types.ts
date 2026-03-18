@@ -8,7 +8,7 @@ export type EventCategory =
 export type CommunityEvent = {
   id: string | number;
   title: string;
-  club?: string;
+  community?: string;
   community_id?: string;
   description?: string;
   location?: string;

@@ -20,7 +20,7 @@ export default function CTASection() {
           Join the METU student community today.
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-300">
-          Create your profile, follow clubs, and never miss another event on
+          Create your profile, follow communities, and never miss another event on
           campus. METUCom keeps everything organized in one place.
         </p>
 

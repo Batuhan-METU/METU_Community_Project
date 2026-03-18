@@ -26,7 +26,7 @@ export default function EventsScreen() {
       const matchSearch =
         !q ||
         e.title.toLowerCase().includes(q) ||
-        e.club?.toLowerCase().includes(q) ||
+        e.community?.toLowerCase().includes(q) ||
         e.location?.toLowerCase().includes(q);
       return matchCat && matchSearch;
     });
@@ -36,7 +36,7 @@ export default function EventsScreen() {
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.headerBlock}>
         <Text style={styles.title}>All Events</Text>
-        <Text style={styles.subtitle}>Find events by club name, category, or topic.</Text>
+        <Text style={styles.subtitle}>Find events by community name, category, or topic.</Text>
       </View>
 
       <View style={styles.controls}>

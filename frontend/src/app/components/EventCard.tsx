@@ -3,7 +3,7 @@ import Link from "next/link";
 interface EventCardProps {
   id: number;
   title: string;
-  club: string;
+  community: string;
   date: string;
   location: string;
   filledSeats: number;
@@ -14,7 +14,7 @@ interface EventCardProps {
 export default function EventCard({
   id,
   title,
-  club,
+  community,
   date,
   location,
   filledSeats,
@@ -49,6 +49,7 @@ export default function EventCard({
             <h3 className="line-clamp-2 text-base font-semibold leading-snug text-slate-50">
               {title}
             </h3>
+            <p className="text-sm text-slate-300">{community}</p>
             <p className="text-sm text-slate-400">{location}</p>
           </div>
           <button

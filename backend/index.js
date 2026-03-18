@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const swaggerJSDoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
 
 dotenv.config();
 
@@ -14,6 +16,30 @@ app.use(express.json());
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", service: "METUHub API" });
 });
+
+// Swagger / OpenAPI docs
+const swaggerSpec = swaggerJSDoc({
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "METUHub API",
+      version: "1.0.0",
+    },
+    servers: [{ url: "http://localhost:8080" }],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
+  },
+  apis: ["./src/routes/*.js"],
+});
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Route modüllerini bağla
 const communitiesRouter = require("./src/routes/communities");

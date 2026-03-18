@@ -36,7 +36,7 @@ export default function HeroSection() {
             at METU.
           </h1>
           <p className="max-w-xl text-lg text-gray-300 md:text-xl">
-            Explore student clubs, join exciting events, and connect with people
+            Explore student communities, join exciting events, and connect with people
             who share your interests across the METU campus.
           </p>
 
@@ -48,7 +48,7 @@ export default function HeroSection() {
               Explore Events
             </Link>
             <Link
-              href="/clubs"
+              href="/communities"
               className="rounded-full border border-white/30 bg-white/5 px-6 py-3 text-sm font-medium text-white backdrop-blur-sm transition duration-300 hover:bg-white/10"
             >
               Join a Community

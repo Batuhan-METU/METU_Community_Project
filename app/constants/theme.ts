@@ -46,7 +46,7 @@ export const Colors = {
 
 export const Gradients = {
   eventCardBg: ['#6366f1', '#d946ef', '#f97316'] as const,   // indigo → fuchsia → orange
-  clubCardBg: ['#10b981', '#14b8a6', '#06b6d4'] as const,    // emerald → teal → cyan
+  communityCardBg: ['#10b981', '#14b8a6', '#06b6d4'] as const,    // emerald → teal → cyan
   accentBtn: ['#6366f1', '#8b5cf6'] as const,                // indigo → violet
 };
 

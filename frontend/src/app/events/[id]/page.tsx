@@ -49,7 +49,7 @@ export default async function EventDetailPage({
         </div>
 
         <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
-          {event.club}
+          {event.community}
         </p>
         <h1 className="mt-2 text-3xl font-bold tracking-tight text-white">
           {event.title}

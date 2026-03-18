@@ -72,7 +72,7 @@ export default function RegisterScreen() {
               </View>
               <Text style={styles.title}>Create your METUHub account</Text>
               <Text style={styles.subtitle}>
-                Join clubs, discover events, and build your campus profile
+                Join communities, discover events, and build your campus profile
               </Text>
 
               {/* Form */}

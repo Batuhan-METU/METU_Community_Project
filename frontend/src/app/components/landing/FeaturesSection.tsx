@@ -8,7 +8,7 @@ const features = [
   {
     title: "Join Communities",
     description:
-      "Find student clubs that match your passions and stay in sync with what they’re doing.",
+      "Find student communities that match your passions and stay in sync with what they’re doing.",
     icon: "👥",
   },
   {
@@ -28,7 +28,7 @@ export default function FeaturesSection() {
             Everything you need to explore campus life
           </h2>
           <p className="mt-4 text-lg text-gray-600">
-            METUCom gives you a single place to discover events, follow clubs,
+            METUCom gives you a single place to discover events, follow communities,
             and never miss what&apos;s happening on campus.
           </p>
         </div>

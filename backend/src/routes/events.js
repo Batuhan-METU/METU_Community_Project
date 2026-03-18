@@ -3,6 +3,16 @@ const router = express.Router();
 const supabase = require('../config/supabaseClient');
 const authMiddleware = require('../middleware/auth');
 
+const MEDIA_BUCKET = 'metuhub_media';
+
+function extractMediaPathFromPublicUrl(publicUrl) {
+  if (!publicUrl || typeof publicUrl !== 'string') return null;
+  const marker = `/storage/v1/object/public/${MEDIA_BUCKET}/`;
+  const idx = publicUrl.indexOf(marker);
+  if (idx === -1) return null;
+  return publicUrl.slice(idx + marker.length);
+}
+
 /**
  * @openapi
  * tags:
@@ -363,6 +373,199 @@ router.post('/:community_id', authMiddleware, async (req, res) => {
     res.status(201).json(data);
   } catch (err) {
     res.status(500).json({ error: 'Etkinlik oluşturulamadı.' });
+  }
+});
+
+/**
+ * @openapi
+ * /api/events/{id}:
+ *   put:
+ *     tags: [Events]
+ *     summary: Etkinlik güncelle (sadece sahibi)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title: { type: string }
+ *               description: { type: string }
+ *               location: { type: string }
+ *               starts_at: { type: string }
+ *               ends_at: { type: string }
+ *               application_deadline: { type: string }
+ *               capacity: { type: integer, nullable: true }
+ *               is_paid: { type: boolean }
+ *               ticket_price: { type: number, nullable: true }
+ *               iban: { type: string, nullable: true }
+ *               slug: { type: string }
+ *     responses:
+ *       200: { description: Güncellendi }
+ *       400: { description: Hatalı istek }
+ *       401: { description: Yetkisiz }
+ *       403: { description: Yetki yok }
+ *       404: { description: Bulunamadı }
+ *       500: { description: Sunucu hatası }
+ */
+// PUT /api/events/:id — sadece etkinliği oluşturan kullanıcı güncelleyebilir
+router.put('/:id', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    const { id } = req.params;
+    const {
+      title,
+      description,
+      location,
+      starts_at,
+      ends_at,
+      application_deadline,
+      capacity,
+      is_paid,
+      ticket_price,
+      iban,
+      slug,
+    } = req.body || {};
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Yetkisiz erişim. Kullanıcı bulunamadı.' });
+    }
+    if (!id) {
+      return res.status(400).json({ error: 'Etkinlik ID bilgisi gereklidir.' });
+    }
+
+    const updates = {};
+    if (typeof title === 'string' && title.trim()) updates.title = title.trim();
+    if (typeof slug === 'string' && slug.trim()) updates.slug = slug.trim();
+    if (typeof description === 'string') updates.description = description.trim() || null;
+    if (typeof location === 'string') updates.location = location.trim() || null;
+    if (typeof starts_at === 'string' && starts_at.trim()) updates.starts_at = starts_at.trim();
+    if (typeof ends_at === 'string') updates.ends_at = ends_at.trim() || null;
+    if (typeof application_deadline === 'string')
+      updates.application_deadline = application_deadline.trim() || null;
+    if (capacity === null || typeof capacity === 'number') updates.capacity = capacity;
+    if (typeof is_paid === 'boolean') updates.is_paid = is_paid;
+    if (ticket_price === null || typeof ticket_price === 'number') updates.ticket_price = ticket_price;
+    if (typeof iban === 'string') updates.iban = iban.trim() || null;
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ error: 'Güncellenecek en az bir alan gönderilmelidir.' });
+    }
+
+    const { data: existing, error: existingError } = await supabase
+      .from('events')
+      .select('id, created_by')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (existingError) {
+      return res.status(500).json({ error: 'Etkinlik bilgisi doğrulanamadı.' });
+    }
+    if (!existing) {
+      return res.status(404).json({ error: 'Etkinlik bulunamadı.' });
+    }
+    if (existing.created_by !== userId) {
+      return res.status(403).json({ error: 'Bu etkinliği güncelleme yetkiniz yok.' });
+    }
+
+    const { data, error } = await supabase
+      .from('events')
+      .update(updates)
+      .eq('id', id)
+      .eq('created_by', userId)
+      .select()
+      .single();
+
+    if (error) {
+      return res.status(400).json({ error: error.message });
+    }
+
+    return res.json({ message: 'Etkinlik güncellendi.', event: data });
+  } catch (err) {
+    return res.status(500).json({ error: 'Etkinlik güncellenemedi.' });
+  }
+});
+
+/**
+ * @openapi
+ * /api/events/{id}:
+ *   delete:
+ *     tags: [Events]
+ *     summary: Etkinlik sil (sadece sahibi)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200: { description: Silindi }
+ *       401: { description: Yetkisiz }
+ *       403: { description: Yetki yok }
+ *       404: { description: Bulunamadı }
+ *       500: { description: Sunucu hatası }
+ */
+// DELETE /api/events/:id — sadece etkinliği oluşturan kullanıcı silebilir
+router.delete('/:id', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    const { id } = req.params;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Yetkisiz erişim. Kullanıcı bulunamadı.' });
+    }
+    if (!id) {
+      return res.status(400).json({ error: 'Etkinlik ID bilgisi gereklidir.' });
+    }
+
+    const { data: existing, error: existingError } = await supabase
+      .from('events')
+      .select('id, created_by, image_url')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (existingError) {
+      return res.status(500).json({ error: 'Etkinlik bilgisi doğrulanamadı.' });
+    }
+    if (!existing) {
+      return res.status(404).json({ error: 'Etkinlik bulunamadı.' });
+    }
+    if (existing.created_by !== userId) {
+      return res.status(403).json({ error: 'Bu etkinliği silme yetkiniz yok.' });
+    }
+
+    // Kapak görselini storage'dan silmeyi best-effort dene
+    const imagePath = extractMediaPathFromPublicUrl(existing.image_url);
+    if (imagePath) {
+      const { error: storageError } = await supabase.storage.from(MEDIA_BUCKET).remove([imagePath]);
+      if (storageError) {
+        console.error('Event image silme hatası:', storageError);
+      }
+    }
+
+    const { error: deleteError } = await supabase
+      .from('events')
+      .delete()
+      .eq('id', id)
+      .eq('created_by', userId);
+
+    if (deleteError) {
+      return res.status(500).json({ error: 'Etkinlik silinemedi.' });
+    }
+
+    return res.json({ message: 'Etkinlik silindi.' });
+  } catch (err) {
+    return res.status(500).json({ error: 'Etkinlik silinemedi.' });
   }
 });
 

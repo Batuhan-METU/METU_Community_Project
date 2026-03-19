@@ -7,7 +7,7 @@ export default function LogoCloud() {
         </p>
         <div className="flex flex-wrap items-center gap-x-10 gap-y-3 opacity-70 grayscale">
           <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-            Student Clubs
+            Student Communities
           </span>
           <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
             Hackathons

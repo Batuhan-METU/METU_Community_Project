@@ -27,6 +27,7 @@ export default function Navbar() {
         {/* Center: nav links (desktop) */}
         <nav className="hidden items-center gap-8 text-sm font-medium text-gray-600 md:flex">
           {[
+            { label: "Explore", href: "/explore" },
             { label: "Communities", href: "/communities" },
             { label: "Events", href: "/events" },
             ...(token ? [{ label: "Dashboard", href: "/admin/dashboard" }] : []),

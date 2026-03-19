@@ -61,6 +61,14 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
+                    href="/explore"
+                    className="transition duration-200 hover:text-black"
+                  >
+                    Explore
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     href="/communities"
                     className="transition duration-200 hover:text-black"
                   >

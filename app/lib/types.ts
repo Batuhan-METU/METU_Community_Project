@@ -5,33 +5,37 @@ export type EventCategory =
   | 'Music'
   | 'Science';
 
+/** Shape returned by GET /api/events */
 export type CommunityEvent = {
-  id: string | number;
+  id: string;
   title: string;
-  community?: string;
+  slug?: string;
   community_id?: string;
   description?: string;
   location?: string;
+  /** Legacy field — prefer starts_at */
   date?: string;
   starts_at?: string;
   ends_at?: string;
-  category?: EventCategory;
+  application_deadline?: string;
   image_url?: string;
   is_paid?: boolean;
-  ticket_price?: number;
-  capacity?: number;
-  filledSeats?: number;
-  totalSeats?: number;
+  ticket_price?: number | null;
+  iban?: string | null;
+  capacity?: number | null;
+  created_by?: string;
+  created_at?: string;
 };
 
+/** Shape returned by GET /api/communities */
 export type Community = {
-  id: string | number;
+  id: string;
   name: string;
   description?: string;
   category?: string;
-  image_url?: string;
-  numberOfEvents?: number;
+  logo_url?: string | null;
   created_by?: string;
+  created_at?: string;
 };
 
 export type FilterCategory = 'All' | EventCategory;

@@ -21,6 +21,16 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
+    "androidStatusBar": {
+      "barStyle": "light-content",
+      "backgroundColor": "#0a0a0f",
+      "translucent": false
+    },
+    "androidNavigationBar": {
+      "barStyle": "light-content",
+      "backgroundColor": "#0a0a0f",
+      "visible": "sticky-immersive"
+    },
     "web": {
       "output": "static",
       "favicon": "./assets/images/favicon.png"

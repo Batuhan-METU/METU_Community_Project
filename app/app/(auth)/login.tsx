@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { BlurView } from 'expo-blur';
+import { StatusBar } from 'expo-status-bar';
 import * as SecureStore from 'expo-secure-store';
 import { Spacing, Radius, FontSize, FontWeight } from '@/constants/theme';
 import { api, AUTH_TOKEN_KEY } from '@/lib/api';
@@ -50,7 +51,8 @@ export default function LoginScreen() {
       source={require('@/assets/images/kapak.jpg')}
       style={styles.bg}
       resizeMode="cover">
-      {/* Dark overlay */}
+      {/* Light icons on this dark background */}
+      <StatusBar style="light" translucent backgroundColor="transparent" />
       <View style={styles.overlay} />
 
       <KeyboardAvoidingView

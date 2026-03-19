@@ -1,9 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import axiosClient from "@/api/axios";
-import type { MockEvent } from "../../lib/mockEvents";
+import { mockEvents } from "../../lib/mockEvents";
 
 export default function EventsPreview() {
   const sortedEvents = [...mockEvents].sort(

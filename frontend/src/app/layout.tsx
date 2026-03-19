@@ -23,18 +23,19 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
-    <html lang="en">
-            <body
-              className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-white text-gray-900 antialiased`}
-            >
-              <Navbar />
-              <main>{children}</main>
-              <Footer />
-            </body>
+    <html lang="tr">
+      <body>
+        {/* İŞTE BURASI: Her şey Providers (veya AuthProvider) içinde olmalı */}
+        <Providers> 
+          <Navbar />
+          <main>{children}</main>
+          <Footer />
+        </Providers>
+      </body>
     </html>
-  );
+  )
 }

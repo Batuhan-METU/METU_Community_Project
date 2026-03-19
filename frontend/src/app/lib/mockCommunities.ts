@@ -1,19 +1,19 @@
-export type ClubCategory =
+export type CommunityCategory =
   | "Engineering"
   | "Business"
   | "Art"
   | "Music"
   | "Science";
 
-export type MockClub = {
+export type MockCommunity = {
   id: number;
   name: string;
   description: string;
-  category: ClubCategory;
+  category: CommunityCategory;
   numberOfEvents: number;
 };
 
-export const mockClubs: MockClub[] = [
+export const mockCommunities: MockCommunity[] = [
   {
     id: 1,
     name: "METU Computer Society",
@@ -24,7 +24,7 @@ export const mockClubs: MockClub[] = [
   },
   {
     id: 2,
-    name: "METU Entrepreneurship Club",
+    name: "METU Entrepreneurship Community",
     description:
       "Brings students together around startups, product thinking, and networking sessions with founders and investors.",
     category: "Business",
@@ -48,7 +48,7 @@ export const mockClubs: MockClub[] = [
   },
   {
     id: 5,
-    name: "METU Astronomy Club",
+    name: "METU Astronomy Community",
     description:
       "Hosts sky observation nights, science talks, and beginner-friendly sessions on astrophysics and telescopes.",
     category: "Science",

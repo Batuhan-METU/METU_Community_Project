@@ -1,89 +1,165 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import Link from "next/link";
+import { useState } from "react";
+import CategorySlider from "../components/CategorySlider";
 
-const CATEGORIES = [
-  { name: "Art", image: "/images/categories/art.jpg" },
-  { name: "Science", image: "/images/categories/science.jpg" },
-  { name: "Technology", image: "/images/categories/technology.jpg" },
-  { name: "Sport", image: "/images/categories/sport.jpg" },
-  { name: "Career", image: "/images/categories/career.jpg" },
+const LOGOS = [
+  "/images/community-logos/vt.png",
+  "/images/community-logos/aft.png",
+  "/images/community-logos/ieee.png",
+  "/images/community-logos/radio.png",
+  "/images/community-logos/cc.png",
+  "/images/community-logos/gst.png",
+  "/images/community-logos/edt.png",
+  "/images/community-logos/arc.png",
+  "/images/community-logos/ilkyar.png",
+  "/images/community-logos/biz.png",
 ];
 
-export default function CommunitiesPage() {
-  const [searchQuery, setSearchQuery] = useState("");
+export default function ClubsPage() {
+  const [aiModalOpen, setAiModalOpen] = useState(false);
+  const [interests, setInterests] = useState("");
 
-  const filteredCategories = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
-    if (!q) return CATEGORIES;
-    return CATEGORIES.filter((category) =>
-      category.name.toLowerCase().includes(q)
-    );
-  }, [searchQuery]);
+  const handleAiSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Placeholder: AI logic will be implemented later
+    setAiModalOpen(false);
+    setInterests("");
+  };
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Dark hero header */}
-      <section className="bg-black py-20">
-        <div className="mx-auto max-w-7xl px-6">
-          <h1 className="text-5xl font-bold text-white md:text-6xl">
-            → See Who&apos;s Texting
+      {/* Hero with video background */}
+      <section className="relative flex min-h-[70vh] items-center justify-center overflow-hidden">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 h-full w-full object-cover"
+          aria-hidden
+        >
+          <source src="/videos/metu-community.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-black/40" aria-hidden />
+        <div className="relative z-10 mx-auto max-w-5xl px-6 text-center">
+          <h1 className="text-5xl font-bold tracking-tight text-white md:text-6xl">
+            Discover Communities at METU
           </h1>
-        </div>
-      </section>
-
-      {/* Search bar */}
-      <section className="mx-auto max-w-7xl px-6 pt-10">
-        <div className="relative">
-          <span className="pointer-events-none absolute inset-y-0 left-5 flex items-center text-gray-400">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              className="h-5 w-5"
-            >
-              <circle cx="11" cy="11" r="6" />
-              <path d="m16 16 4 4" />
-            </svg>
-          </span>
-          <input
-            type="text"
-            placeholder="Find communities..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-full border border-gray-300 px-6 py-4 pl-12 text-lg text-gray-900 shadow-sm outline-none placeholder:text-gray-500 focus:ring-2 focus:ring-black"
-          />
-        </div>
-      </section>
-
-      {/* Category discovery grid */}
-      <section className="mx-auto max-w-7xl px-6 py-16">
-        {filteredCategories.length === 0 ? (
-          <p className="py-12 text-center text-gray-500">
-            No categories found
+          <p className="mt-4 text-lg text-gray-200">
+            Explore student clubs, connect with communities, and find your people
+            on campus.
           </p>
-        ) : (
-          <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
-            {filteredCategories.map((category) => (
-              <div
-                key={category.name}
-                className="relative h-52 cursor-pointer overflow-hidden rounded-xl transition duration-300 hover:scale-[1.03]"
-              >
-                <div
-                  className="absolute inset-0 h-full w-full bg-cover bg-center bg-no-repeat"
-                  style={{ backgroundImage: `url(${category.image})` }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                <h2 className="absolute bottom-4 left-4 text-xl font-semibold text-white">
-                  {category.name}
-                </h2>
-              </div>
-            ))}
-          </div>
-        )}
+        </div>
       </section>
+
+      <CategorySlider />
+
+      {/* Community trust - logo carousel */}
+      <section className="py-24">
+        <div className="mx-auto max-w-7xl px-6">
+          <h2 className="mx-auto mb-16 max-w-4xl text-center text-4xl font-bold text-gray-900 md:text-5xl">
+            Driving Engagement Through Student Communities at METU
+          </h2>
+
+          <div className="relative w-full overflow-hidden py-10">
+            <div
+              className="inline-flex items-center gap-12"
+              style={{ animation: "logoScroll 25s linear infinite" }}
+            >
+              {[...LOGOS, ...LOGOS].map((src, i) => (
+                <div
+                  key={`${src}-${i}`}
+                  className="flex h-20 w-20 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-white p-3 shadow-sm opacity-80 transition duration-300 hover:scale-110 hover:opacity-100"
+                >
+                  <img
+                    src={src}
+                    alt=""
+                    className="h-full w-full object-contain"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-12 flex justify-center">
+            <Link
+              href="/communities"
+              className="rounded-full bg-green-500 px-8 py-3 font-medium text-white transition hover:bg-green-600"
+            >
+              Join a Community →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* AI recommendation section */}
+      <section className="border-t border-gray-100 bg-gray-50 py-24">
+        <div className="mx-auto max-w-4xl px-6 text-center">
+          <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">
+            Can&apos;t find the club you&apos;re looking for?
+          </h2>
+          <p className="mt-4 text-gray-600">
+            Our AI can help you discover the perfect community based on your
+            interests.
+          </p>
+          <button
+            type="button"
+            onClick={() => setAiModalOpen(true)}
+            className="mt-8 rounded-full bg-green-500 px-8 py-3 font-medium text-white transition hover:bg-green-600"
+          >
+            Find Clubs with AI →
+          </button>
+        </div>
+      </section>
+
+      {/* AI modal (placeholder for future AI integration) */}
+      {aiModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => setAiModalOpen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="ai-modal-title"
+        >
+          <div
+            className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <h3 id="ai-modal-title" className="text-lg font-semibold text-gray-900">
+                What are your interests?
+              </h3>
+              <button
+                type="button"
+                onClick={() => setAiModalOpen(false)}
+                className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                aria-label="Close"
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <form onSubmit={handleAiSubmit} className="mt-4 space-y-4">
+              <input
+                type="text"
+                value={interests}
+                onChange={(e) => setInterests(e.target.value)}
+                placeholder="Technology, music, robotics..."
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder:text-gray-500 focus:ring-2 focus:ring-green-500"
+              />
+              <button
+                type="submit"
+                className="w-full rounded-full bg-green-500 py-3 font-medium text-white transition hover:bg-green-600"
+              >
+                Get Recommendations
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

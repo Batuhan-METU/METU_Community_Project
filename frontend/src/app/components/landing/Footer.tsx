@@ -61,7 +61,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/clubs"
+                    href="/communities"
                     className="transition duration-200 hover:text-black"
                   >
                     Communities

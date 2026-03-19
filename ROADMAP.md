@@ -99,9 +99,9 @@ Gerçek veriyi PostgreSQL’e taşımadan önce schema’yı netleştirin.
 
 ---
 
-# FAZA 3: Kulüpler İçin Araçlar (2–3 hafta)
+# FAZA 3: Topluluklar İçin Araçlar (2–3 hafta)
 
-## 3.1 Kulüp Paneli
+## 3.1 Topluluk Paneli
 
 - Topluluk yöneticileri için dashboard (rol: `community_admin`)
 - Kendi etkinliklerini ekleme / düzenleme / silme
@@ -113,23 +113,23 @@ Gerçek veriyi PostgreSQL’e taşımadan önce schema’yı netleştirin.
   - Görüntülenme sayısı
   - Kayıt sayısı
   - “İlgi duyuyorum” tıklaması (opsiyonel)
-- Kulüp panelinde “Hangi etkinlik daha çok ilgi gördü?” raporu
+- Topluluk panelinde “Hangi etkinlik daha çok ilgi gördü?” raporu
 - Grafik: kayıt sayısı, görüntülenme vs. zaman
 
 ## 3.3 Üye Memnuniyet Oranı
 
 - Etkinlik sonrası kısa anket (1–5 yıldız veya “Memnun kaldım / Kaldım / Kalmadım”)
 - `event_feedback` tablosu
-- Kulüp panelinde ortalama memnuniyet skoru
+- Topluluk panelinde ortalama memnuniyet skoru
 - Zaman içinde trend grafiği
 
 ## 3.4 İlan Verme
 
-- Kulüpler için duyuru/ilan sistemi
+- Topluluklar için duyuru/ilan sistemi
 - “X kişi arıyoruz”, “Y etkinliği için gönüllü”, “Z için ekip kuruyoruz”
 - `announcements` tablosu, tarih + kategorize
 
-**Bu fazın çıktısı:** Kulüpler kendi etkinliklerini yönetebilir, ilgi ve memnuniyet verilerini görebilir.
+**Bu fazın çıktısı:** Topluluklar kendi etkinliklerini yönetebilir, ilgi ve memnuniyet verilerini görebilir.
 
 ---
 
@@ -145,7 +145,7 @@ Gerçek veriyi PostgreSQL’e taşımadan önce schema’yı netleştirin.
 
 - Geçmiş etkinliklerde kayıt sayısı vs. gerçek katılım oranı
 - Yeni etkinlik için “Tahmini katılım: ~%70 (X kişi)” gösterimi
-- Kulüp panelinde kapasite planlaması önerisi
+- Topluluk panelinde kapasite planlaması önerisi
 
 ## 4.3 Hazırlıklar İçin “Beraber Gidin”
 
@@ -154,12 +154,13 @@ Gerçek veriyi PostgreSQL’e taşımadan önce schema’yı netleştirin.
 - Eşleşme: aynı etkinliğe kayıtlı, uyumlu kullanıcılar birbirini görebilir (anonim veya isteğe bağlı)
 - Tablo: `event_companion_requests` veya benzeri
 
-## 4.4 Yeni Kulüp Tayfa
+## 4.4 Yeni Topluluk Tayfa
 
-- “Yeni kulüp kurmak isteyenler” formu
+- “Yeni topluluk kurmak isteyenler” formu
 - Benzer ilgi alanlarına sahip kullanıcıları eşleştir
-- “Sizinle aynı alanda kulüp kurmak isteyen X kişi var” bildirimi
-- `club_formation_requests` tablosu
+- “Sizinle aynı alanda topluluk kurmak isteyen X kişi var” bildirimi
+- `community_formation_requests` tablosu
+
 
 **Bu fazın çıktısı:** Daha sosyal, planlamaya yardımcı bir deneyim.
 
@@ -226,7 +227,7 @@ Gerçek veriyi PostgreSQL’e taşımadan önce schema’yı netleştirin.
 | **0** | DB, migration, temel routing | 1–2 hafta |
 | **1** | Auth, profil, filtre, topluluk sayfası, başvuru | 2–3 hafta |
 | **2** | Öneri sistemi + AI ilgi alanı | 2–3 hafta |
-| **3** | Kulüp paneli, ilgi/memnuniyet, ilan | 2–3 hafta |
+| **3** | Topluluk paneli, ilgi/memnuniyet, ilan | 2–3 hafta |
 | **4** | Çakışma uyarısı, katılım tahmini, beraber git, yeni kulüp | 2–3 hafta |
 | **5** | Cüzdan, ödeme, bilet | 2–4 hafta |
 | **6** | Mobil uygulama | 3–4 hafta |
@@ -240,7 +241,7 @@ Gerçek veriyi PostgreSQL’e taşımadan önce schema’yı netleştirin.
 En hızlı değer için:
 
 1. **Faza 0 + Faza 1** — Temel akışı çalışır hale getirin.
-2. **Faza 3 (3.1, 3.2)** — Kulüpler kendi etkinliklerini girsin, ilgi verisi toplansın.
+2. **Faza 3 (3.1, 3.2)** — Topluluklar kendi etkinliklerini girsin, ilgi verisi toplansın.
 3. **Faza 2** — AI/öneri ile fark yaratın.
 4. **Faza 4** — Çakışma ve “beraber git” ile sosyal katmanı ekleyin.
 5. **Faza 5** — Cüzdan/ödeme ihtiyaç olursa.

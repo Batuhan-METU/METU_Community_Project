@@ -2,7 +2,7 @@ const profiles = [
   {
     name: "Ece Yılmaz",
     department: "Computer Engineering",
-    bio: "AI & Robotics Club lead. Organizing weekly meetups on AI and real-world projects.",
+    bio: "AI & Robotics Community lead. Organizing weekly meetups on AI and real-world projects.",
   },
   {
     name: "Mert Demir",
@@ -12,7 +12,7 @@ const profiles = [
   {
     name: "Zeynep Kaya",
     department: "Business Administration",
-    bio: "Entrepreneurship Club. Helping students turn ideas into startups.",
+    bio: "Entrepreneurship Community. Helping students turn ideas into startups.",
   },
   {
     name: "Ali Can",

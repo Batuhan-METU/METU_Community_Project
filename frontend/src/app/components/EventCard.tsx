@@ -1,11 +1,12 @@
 import Link from "next/link";
 
 interface EventCardProps {
-  id: number;
+  id: string | number;
   title: string;
-  club: string;
+  community: string;
   date: string;
   location: string;
+  imageUrl?: string | null;
   filledSeats: number;
   totalSeats: number;
   joined?: boolean;
@@ -14,9 +15,10 @@ interface EventCardProps {
 export default function EventCard({
   id,
   title,
-  club,
+  community,
   date,
   location,
+  imageUrl,
   filledSeats,
   totalSeats,
   joined = false,
@@ -39,7 +41,15 @@ export default function EventCard({
     <Link href={`/events/${id}`} className="group block h-full">
       <article className="flex h-full transform flex-col justify-between rounded-2xl bg-slate-950/95 shadow-md shadow-black/40 ring-1 ring-slate-800 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/60">
         <div className="relative h-40 overflow-hidden rounded-2xl rounded-b-none">
-          <div className="h-full w-full bg-gradient-to-br from-indigo-500 via-fuchsia-500 to-orange-400" />
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={`${title} görseli`}
+              className="h-full w-full object-cover opacity-95 transition-transform duration-300 group-hover:scale-105"
+            />
+          ) : (
+            <div className="h-full w-full bg-gradient-to-br from-indigo-500 via-fuchsia-500 to-orange-400" />
+          )}
         </div>
         <div className="flex h-full flex-col justify-between gap-3 rounded-2xl rounded-t-none bg-slate-900 px-4 py-4">
           <div className="space-y-2">
@@ -49,6 +59,7 @@ export default function EventCard({
             <h3 className="line-clamp-2 text-base font-semibold leading-snug text-slate-50">
               {title}
             </h3>
+            <p className="text-sm text-slate-300">{community}</p>
             <p className="text-sm text-slate-400">{location}</p>
           </div>
           <button

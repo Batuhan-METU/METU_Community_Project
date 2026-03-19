@@ -1,22 +1,33 @@
 import Link from "next/link";
 
-type ClubCardProps = {
-  id: number;
+type CommunityCardProps = {
+  id: string | number;
   name: string;
   description: string;
-  eventCount: number;
+  logoUrl?: string | null;
+  eventCount?: number;
 };
 
-export default function ClubCard({
+export default function CommunityCard({
   id,
   name,
   description,
+  logoUrl,
   eventCount,
-}: ClubCardProps) {
+}: CommunityCardProps) {
   return (
-    <Link href={`/clubs/${id}`} className="group block h-full">
+    <Link href={`/communities/${id}`} className="group block h-full">
       <article className="flex h-full transform flex-col justify-between overflow-hidden rounded-2xl bg-neutral-900 ring-1 ring-neutral-800 transition-all duration-300 hover:-translate-y-1 hover:ring-neutral-700 hover:shadow-xl hover:shadow-black/50">
-        <div className="relative h-32 overflow-hidden rounded-b-none bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500" />
+        <div className="relative h-32 overflow-hidden rounded-b-none bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500">
+          {logoUrl ? (
+            // Storage'dan gelen public URL zaten direkt açılabilir.
+            <img
+              src={logoUrl}
+              alt={`${name} logosu`}
+              className="h-full w-full object-cover opacity-95 transition-transform duration-300 group-hover:scale-105"
+            />
+          ) : null}
+        </div>
 
         <div className="flex h-full flex-col justify-between gap-4 px-4 py-4">
           <div className="space-y-2">
@@ -30,8 +41,12 @@ export default function ClubCard({
               {description}
             </p>
             <p className="text-sm text-neutral-500">
-              <span className="font-medium text-neutral-300">{eventCount}</span>{" "}
-              events
+              {typeof eventCount === "number" ? (
+                <>
+                  <span className="font-medium text-neutral-300">{eventCount}</span>{" "}
+                  events
+                </>
+              ) : null}
             </p>
           </div>
 
@@ -39,7 +54,7 @@ export default function ClubCard({
             type="button"
             className="w-full rounded-full bg-neutral-800 px-4 py-2 text-sm font-medium text-neutral-200 transition-colors hover:bg-neutral-700"
           >
-            View Club
+            View Community
           </button>
         </div>
       </article>

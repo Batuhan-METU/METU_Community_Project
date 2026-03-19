@@ -4,6 +4,41 @@ const authMiddleware = require("../middleware/auth");
 
 const router = express.Router();
 
+/**
+ * @openapi
+ * tags:
+ *   - name: Users
+ *     description: Kullanıcı kayıt/giriş ve profil işlemleri
+ */
+
+/**
+ * @openapi
+ * /api/users/register:
+ *   post:
+ *     tags: [Users]
+ *     summary: Kullanıcı kaydı
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password, full_name]
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               full_name:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Kayıt başarılı
+ *       400:
+ *         description: Hatalı istek
+ *       500:
+ *         description: Sunucu hatası
+ */
 // POST /api/users/register
 router.post("/register", async (req, res) => {
   try {
@@ -36,6 +71,34 @@ router.post("/register", async (req, res) => {
   }
 });
 
+/**
+ * @openapi
+ * /api/users/login:
+ *   post:
+ *     tags: [Users]
+ *     summary: Kullanıcı girişi
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password]
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Giriş başarılı (access_token döner)
+ *       400:
+ *         description: Hatalı istek
+ *       401:
+ *         description: Yetkisiz
+ *       500:
+ *         description: Sunucu hatası
+ */
 // POST /api/users/login
 router.post("/login", async (req, res) => {
   try {
@@ -67,6 +130,24 @@ router.post("/login", async (req, res) => {
   }
 });
 
+/**
+ * @openapi
+ * /api/users/me:
+ *   get:
+ *     tags: [Users]
+ *     summary: Giriş yapan kullanıcının profilini getir
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Profil
+ *       401:
+ *         description: Yetkisiz
+ *       404:
+ *         description: Profil bulunamadı
+ *       500:
+ *         description: Sunucu hatası
+ */
 // GET /api/users/me
 router.get("/me", authMiddleware, async (req, res) => {
   try {

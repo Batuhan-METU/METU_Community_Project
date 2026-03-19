@@ -1,5 +1,9 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { mockEvents } from "../../lib/mockEvents";
+import axiosClient from "@/api/axios";
+import type { MockEvent } from "../../lib/mockEvents";
 
 export default function EventsPreview() {
   const sortedEvents = [...mockEvents].sort(
@@ -35,7 +39,15 @@ export default function EventsPreview() {
               key={event.id}
               className="flex h-full flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:shadow-lg"
             >
-              <div className="h-40 bg-gradient-to-br from-indigo-500 via-sky-500 to-purple-500" />
+              {event.imageUrl ? (
+                <img
+                  src={event.imageUrl}
+                  alt={`${event.title} görseli`}
+                  className="h-40 w-full object-cover"
+                />
+              ) : (
+                <div className="h-40 bg-gradient-to-br from-indigo-500 via-sky-500 to-purple-500" />
+              )}
               <div className="flex flex-1 flex-col justify-between p-5">
                 <div className="space-y-2">
                   <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
@@ -48,7 +60,7 @@ export default function EventsPreview() {
                   <h3 className="line-clamp-2 text-lg font-semibold text-gray-900">
                     {event.title}
                   </h3>
-                  <p className="text-sm text-gray-600">{event.club}</p>
+                  <p className="text-sm text-gray-600">{event.community}</p>
                 </div>
                 <div className="mt-4 flex items-center justify-between">
                   <p className="text-xs text-gray-500">

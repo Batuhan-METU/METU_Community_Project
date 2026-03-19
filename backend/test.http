@@ -1,0 +1,257 @@
+### --- DEĞİŞKENLER ---
+@baseUrl = http://localhost:8080/api
+@communityId = e772a4d1-98a3-44d9-a1a5-9dad9c5de59e
+
+### 1. ADIM: GİRİŞ YAP (Kimlik Doğrulama)
+# @name login
+POST {{baseUrl}}/users/login
+Content-Type: application/json
+
+{
+  "email": "tayanc@metu.edu.tr",
+  "password": "Sifre123!"
+}
+
+### Token'ı Otomatik Yakala
+@authToken = {{login.response.body.session.access_token}}
+
+---
+
+### 2. ADIM: TEST VERİLERİ OLUŞTURMA (Setup)
+# Farklı tarihlerde ve kategorilerde 2 etkinlik ekliyoruz.
+
+### A. Gelecek Etkinlik (Teknik)
+POST {{baseUrl}}/events/{{communityId}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "title": "C++ ile Modern Yazılım",
+  "description": "C++20 standartlarını ODTÜ'de tartışıyoruz.",
+  "starts_at": "2026-05-15T10:00:00Z",
+  "location": "BMB-1",
+  "capacity": 50,
+  "category": "Teknik"
+}
+
+### B. Çok Yakın Etkinlik (Sosyal)
+POST {{baseUrl}}/events/{{communityId}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "title": "Kampüste Kahve Tanışması",
+  "description": "Yazılımcılar arası networking ve kahve.",
+  "starts_at": "2026-04-01T14:00:00Z",
+  "location": "Çarşı A4",
+  "capacity": 20,
+  "category": "Sosyal"
+}
+
+
+### 3. ADIM: 1.5 KEŞFETME VE ARAMA TESTLERİ
+
+### TEST 3.1: Metin Araması (ILIKE Kontrolü)
+# "c++" küçük harf yazsak bile "C++ ile Modern Yazılım" gelmeli.
+GET {{baseUrl}}/events/search?q=c%2B%2B
+Authorization: Bearer {{authToken}}
+
+### TEST 3.2: Kategori Filtreleme
+# Sadece "Teknik" olanları getirmeli.
+GET {{baseUrl}}/events/filter?category=Teknik
+Authorization: Bearer {{authToken}}
+
+### TEST 3.3: Tarih Sıralama (En Önemlisi!)
+# Bu istekte "Kampüste Kahve" (Nisan), "C++" (Mayıs) etkinliğinden önce gelmeli.
+# @name listEvents
+GET {{baseUrl}}/events
+Authorization: Bearer {{authToken}}
+
+### TEST 3.4: Topluluk Arama
+GET {{baseUrl}}/communities/search?q=Motorsport
+Authorization: Bearer {{authToken}}
+
+---
+
+### 4. ADIM: KATILIM VE DOLULUK TESTİ (1.4 Hatırlatması)
+# Önce listeleme yapıp bir eventId almalısın.
+@eventId = {{listEvents.response.body.0.id}}
+
+### Etkinliğe Katıl
+POST {{baseUrl}}/events/join/{{eventId}}
+Authorization: Bearer {{authToken}}
+
+### Aynı Etkinliğe Tekrar Katıl (400: Zaten katıldınız)
+POST {{baseUrl}}/events/join/{{eventId}}
+Authorization: Bearer {{authToken}}
+
+### --- 1.6 KİŞİSEL DASHBOARD TESTLERİ ---
+
+### 1. Benim Profil Bilgilerim
+# Beklenen: Senin ismin, emailin ve id bilgin.
+GET {{baseUrl}}/me/profile
+Authorization: Bearer {{authToken}}
+
+---
+
+### 2. Katıldığım Etkinlikler
+# Beklenen: 'Katıl' dediğin etkinliklerin listesi ve detayları.
+GET {{baseUrl}}/me/events
+Authorization: Bearer {{authToken}}
+
+---
+
+### 3. Sahibi Olduğum Topluluklar
+# Beklenen: Senin kurduğun (created_by) toplulukların listesi.
+GET {{baseUrl}}/me/communities
+Authorization: Bearer {{authToken}}
+
+### --- 1.6.2 FİNAL DOKUNUŞLARI TESTLERİ ---
+
+### 1. Profil İsmini Güncelle
+# Beklenen: İsminin değişmesi ve 200 OK.
+PUT {{baseUrl}}/me/profile
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "full_name": "Tayanç Daloğlu (Updated)"
+}
+
+
+### 2. Etkinlikten Ayrıl (Vazgeç)
+# Beklenen: Katılımın silinmesi ve 200 OK.
+# @eventId değerini daha önceki listeleme testinden aldığını varsayıyoruz.
+DELETE {{baseUrl}}/me/events/{{eventId}}
+Authorization: Bearer {{authToken}}
+
+### --- 1.7 GÖRSEL YÜKLEME TESTLERİ ---
+
+### 1. Profil Fotoğrafı Yükle
+POST {{baseUrl}}/upload/profile
+Authorization: Bearer {{authToken}}
+Content-Type: multipart/form-data; boundary=MyBoundary
+
+--MyBoundary
+Content-Disposition: form-data; name="image"; filename="deneme.jpg"
+Content-Type: image/jpeg
+
+< ./deneme.jpg
+--MyBoundary--
+
+### 2. Topluluk Logosu Yükle
+# @communityId değerinin yukarıda tanımlı olduğundan emin ol.
+POST {{baseUrl}}/upload/community/{{communityId}}
+Authorization: Bearer {{authToken}}
+Content-Type: multipart/form-data; boundary=MyBoundary
+
+--MyBoundary
+Content-Disposition: form-data; name="image"; filename="community_logo.jpg"
+Content-Type: image/jpeg
+
+< ./deneme.jpg
+--MyBoundary--
+
+### 3. Etkinlik Kapak Fotoğrafı Yükle
+# listEvents'ten gelen bir id kullanabilirsin.
+@targetEventId = {{listEvents.response.body.0.id}}
+POST {{baseUrl}}/upload/event/{{targetEventId}}
+Authorization: Bearer {{authToken}}
+Content-Type: multipart/form-data; boundary=MyBoundary
+
+--MyBoundary
+Content-Disposition: form-data; name="image"; filename="event_cover.jpg"
+Content-Type: image/jpeg
+
+< ./deneme.jpg
+--MyBoundary--
+
+---
+
+### --- COMMUNITY & EVENT CRUD (PUT/DELETE) TESTLERİ ---
+
+### 1) Yeni bir test topluluğu oluştur (owner = authToken)
+# @name createCommunity
+POST {{baseUrl}}/communities
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "CRUD Test Topluluğu",
+  "description": "PUT/DELETE testleri için",
+  "category": "Test"
+}
+
+### 2) Topluluğu güncelle (200 beklenir)
+PUT {{baseUrl}}/communities/{{createCommunity.response.body.id}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "description": "Güncellendi",
+  "category": "Test-Updated"
+}
+
+### 3) İkinci kullanıcı ile giriş yap (başkasının kaydını silme testi için)
+# Önce ikinci kullanıcıyı oluştur (bir kez çalıştırman yeterli; zaten varsa 400 dönebilir)
+# @name registerOther
+POST {{baseUrl}}/users/register
+Content-Type: application/json
+
+{
+  "email": "other@metu.edu.tr",
+  "password": "Sifre123!",
+  "full_name": "Other User"
+}
+
+### 3.1) İkinci kullanıcı ile giriş yap
+# @name loginOther
+POST {{baseUrl}}/users/login
+Content-Type: application/json
+
+{
+  "email": "other@metu.edu.tr",
+  "password": "Sifre123!"
+}
+
+### 4) Başkasının topluluğunu silmeye çalış (403 beklenir)
+DELETE {{baseUrl}}/communities/{{createCommunity.response.body.id}}
+Authorization: Bearer {{loginOther.response.body.session.access_token}}
+
+### 5) Owner olarak topluluğu sil (200 beklenir)
+DELETE {{baseUrl}}/communities/{{createCommunity.response.body.id}}
+Authorization: Bearer {{authToken}}
+
+---
+
+### 6) Yeni bir test etkinliği oluştur (owner = authToken)
+# @name createEventForCrud
+POST {{baseUrl}}/events/{{communityId}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "title": "CRUD Test Event",
+  "description": "PUT/DELETE testleri için",
+  "starts_at": "2026-06-01T10:00:00Z",
+  "location": "Test",
+  "capacity": 10
+}
+
+### 7) Etkinliği güncelle (200 beklenir)
+PUT {{baseUrl}}/events/{{createEventForCrud.response.body.id}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "location": "Test-Updated",
+  "capacity": 25
+}
+
+### 8) Başkasının etkinliğini silmeye çalış (403 beklenir)
+DELETE {{baseUrl}}/events/{{createEventForCrud.response.body.id}}
+Authorization: Bearer {{loginOther.response.body.session.access_token}}
+
+### 9) Owner olarak etkinliği sil (200 beklenir)
+DELETE {{baseUrl}}/events/{{createEventForCrud.response.body.id}}
+Authorization: Bearer {{authToken}}

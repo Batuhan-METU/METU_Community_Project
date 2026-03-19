@@ -9,9 +9,7 @@ import type { MockEvent } from "../lib/mockEvents";
 
 export default function EventsPage() {
   const [searchText, setSearchText] = useState("");
-  const [selectedCategory, setSelectedCategory] =
-    useState<FilterCategory>("All");
-
+  const [selectedCategory, setSelectedCategory] = useState<FilterCategory>("All");
   const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState<MockEvent[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -19,7 +17,6 @@ export default function EventsPage() {
 
   useEffect(() => {
     let alive = true;
-    setLoading(true);
     setError(null);
 
     axiosClient
@@ -27,18 +24,13 @@ export default function EventsPage() {
       .then((r) => {
         if (!alive) return;
         const map: Record<string, string> = {};
-        for (const c of r.data || []) {
-          map[String(c.id)] = c.name;
-        }
+        for (const c of r.data || []) map[String(c.id)] = c.name;
         setCommunityMap(map);
       })
-      .catch((e) => {
+      .catch((e: unknown) => {
         if (!alive) return;
-        setError(e?.response?.data?.error || "Topluluklar alınamadı.");
-      })
-      .finally(() => {
-        if (!alive) return;
-        // events fetch ayrı useEffect ile yapılacak
+        const err = e as { response?: { data?: { error?: string } }; message?: string };
+        setError(err?.response?.data?.error || err?.message || "Topluluklar alınamadı.");
       });
 
     return () => {
@@ -48,7 +40,8 @@ export default function EventsPage() {
 
   useEffect(() => {
     let alive = true;
-    const run = async () => {
+
+    async function run() {
       setLoading(true);
       setError(null);
 
@@ -66,7 +59,6 @@ export default function EventsPage() {
 
         const q = searchText.trim();
         const qLower = q.toLowerCase();
-
         let apiEvents: ApiEvent[] = [];
 
         if (selectedCategory !== "All") {
@@ -113,21 +105,17 @@ export default function EventsPage() {
           response?: { status?: number; data?: { error?: string } };
           message?: string;
         };
-        const status = err?.response?.status;
-        if (status === 401) {
+        if (err?.response?.status === 401) {
           alert("Oturumun süresi dolmuş olabilir. Lütfen tekrar giriş yap.");
         }
-        setError(
-          err?.response?.data?.error || err?.message || "Etkinlikler alınamadı."
-        );
+        setError(err?.response?.data?.error || err?.message || "Etkinlikler alınamadı.");
       } finally {
         if (!alive) return;
         setLoading(false);
       }
-    };
+    }
 
     run();
-
     return () => {
       alive = false;
     };
@@ -135,9 +123,7 @@ export default function EventsPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-12">
-      <h1 className="text-3xl font-bold tracking-tight text-white">
-        All Events
-      </h1>
+      <h1 className="text-3xl font-bold tracking-tight text-white">All Events</h1>
       <p className="mt-2 text-sm text-neutral-500">
         Find events by community name, category, or topic.
       </p>
@@ -152,9 +138,7 @@ export default function EventsPage() {
 
       <div className="mt-8">
         {loading ? (
-          <p className="py-12 text-center text-sm text-neutral-500">
-            Yükleniyor...
-          </p>
+          <p className="py-12 text-center text-sm text-neutral-500">Yükleniyor...</p>
         ) : error ? (
           <p className="py-12 text-center text-sm text-red-400">{error}</p>
         ) : (
@@ -164,3 +148,4 @@ export default function EventsPage() {
     </div>
   );
 }
+

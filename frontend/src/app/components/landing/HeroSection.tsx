@@ -3,25 +3,15 @@ import Link from "next/link";
 export default function HeroSection() {
   return (
     <section className="relative flex min-h-[70vh] flex-col overflow-hidden py-24">
-      {/* Background image: visible but balanced */}
       <div
         aria-hidden="true"
         className="absolute inset-0 bg-cover bg-center bg-no-repeat brightness-90 contrast-[1.05]"
         style={{ backgroundImage: "url(/images/metu-campus.jpeg)" }}
       />
-      {/* Light gray overlay for text readability */}
       <div
         aria-hidden="true"
         className="absolute inset-0 bg-gradient-to-b from-gray-900/40 to-gray-900/60"
       />
-      {/* Decorative blur orbs (optional) */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10"
-      >
-        <div className="absolute -top-40 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-indigo-500/10 blur-3xl" />
-        <div className="absolute -bottom-32 right-10 h-72 w-72 rounded-full bg-purple-500/10 blur-3xl" />
-      </div>
 
       <div className="relative z-10 mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center px-6 text-center">
         <div className="flex flex-col items-center space-y-6">
@@ -48,17 +38,12 @@ export default function HeroSection() {
               Explore Events
             </Link>
             <Link
-              href="/communities"
+              href="/create-event"
               className="rounded-full border border-white/30 bg-white/5 px-6 py-3 text-sm font-medium text-white backdrop-blur-sm transition duration-300 hover:bg-white/10"
             >
-              Join a Community
+              Create Event
             </Link>
           </div>
-
-          <p className="text-sm text-gray-400">
-            Built for METU students to make campus life more connected and
-            effortless.
-          </p>
         </div>
       </div>
     </section>

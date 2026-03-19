@@ -4,7 +4,6 @@ import FeaturesSection from "./components/landing/FeaturesSection";
 import EventsPreview from "./components/landing/EventsPreview";
 import TestimonialsSection from "./components/landing/TestimonialsSection";
 import CTASection from "./components/landing/CTASection";
-import Footer from "./components/landing/Footer";
 
 export default function Home() {
   return (
@@ -15,7 +14,6 @@ export default function Home() {
       <EventsPreview />
       <TestimonialsSection />
       <CTASection />
-      <Footer />
     </>
   );
 }

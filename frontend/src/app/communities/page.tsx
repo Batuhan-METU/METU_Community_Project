@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import axiosClient from "@/api/axios";
 import CommunityCard from "../components/CommunityCard";
+import CategorySlider from "../components/CategorySlider";
 
 type ApiCommunity = {
   id: string | number;
@@ -23,6 +24,14 @@ export default function CommunitiesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [communities, setCommunities] = useState<ApiCommunity[]>([]);
+  const [aiModalOpen, setAiModalOpen] = useState(false);
+  const [interests, setInterests] = useState("");
+
+  const handleAiSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setAiModalOpen(false);
+    setInterests("");
+  };
 
   useEffect(() => {
     let alive = true;
@@ -83,6 +92,8 @@ export default function CommunitiesPage() {
         </div>
       </section>
 
+      <CategorySlider />
+
       {/* Community trust - logo carousel */}
       <section className="py-24">
         <div className="mx-auto max-w-7xl px-6">
@@ -139,6 +150,70 @@ export default function CommunitiesPage() {
           </div>
         )}
       </section>
+
+      <section className="border-t border-gray-100 bg-gray-50 py-24">
+        <div className="mx-auto max-w-4xl px-6 text-center">
+          <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">
+            Aradığınız topluluğu bulamadınız mı?
+          </h2>
+          <p className="mt-4 text-gray-600">
+            AI desteğiyle ilgi alanlarınıza uygun toplulukları keşfedin.
+          </p>
+          <button
+            type="button"
+            onClick={() => setAiModalOpen(true)}
+            className="mt-8 rounded-full bg-green-500 px-8 py-3 font-medium text-white transition hover:bg-green-600"
+          >
+            AI ile Topluluk Bul →
+          </button>
+        </div>
+      </section>
+
+      {aiModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => setAiModalOpen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="ai-modal-title"
+        >
+          <div
+            className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <h3 id="ai-modal-title" className="text-lg font-semibold text-gray-900">
+                İlgi alanlarınız neler?
+              </h3>
+              <button
+                type="button"
+                onClick={() => setAiModalOpen(false)}
+                className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                aria-label="Close"
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <form onSubmit={handleAiSubmit} className="mt-4 space-y-4">
+              <input
+                type="text"
+                value={interests}
+                onChange={(e) => setInterests(e.target.value)}
+                placeholder="Teknoloji, müzik, robotik..."
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder:text-gray-500 focus:ring-2 focus:ring-green-500"
+              />
+              <button
+                type="submit"
+                className="w-full rounded-full bg-green-500 py-3 font-medium text-white transition hover:bg-green-600"
+              >
+                Öneri Getir
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

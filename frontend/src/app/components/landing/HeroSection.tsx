@@ -42,16 +42,16 @@ export default function HeroSection() {
 
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link
-              href="/events"
+              href="/events/explore-events"
               className="rounded-full bg-white px-6 py-3 text-sm font-medium text-gray-900 shadow-sm transition duration-300 hover:bg-gray-100 hover:shadow-md"
             >
               Explore Events
             </Link>
             <Link
-              href="/clubs"
+              href="/create-event"
               className="rounded-full border border-white/30 bg-white/5 px-6 py-3 text-sm font-medium text-white backdrop-blur-sm transition duration-300 hover:bg-white/10"
             >
-              Join a Community
+              Create Event
             </Link>
           </div>
 

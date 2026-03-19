@@ -2,7 +2,10 @@ import Link from "next/link";
 import { mockEvents } from "../../lib/mockEvents";
 
 export default function EventsPreview() {
-  const previewEvents = mockEvents.slice(0, 3);
+  const sortedEvents = [...mockEvents].sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+  const upcomingEvents = sortedEvents.slice(0, 3);
 
   return (
     <section className="bg-gray-100 py-24">
@@ -18,7 +21,7 @@ export default function EventsPreview() {
             </p>
           </div>
           <Link
-            href="/events"
+            href="/events/explore-events"
             className="text-sm font-medium text-gray-700 underline-offset-4 transition hover:text-gray-900 hover:underline"
           >
             View all events
@@ -27,10 +30,10 @@ export default function EventsPreview() {
 
         {/* Event cards */}
         <div className="mt-10 grid gap-8 md:grid-cols-3">
-          {previewEvents.map((event) => (
+          {upcomingEvents.map((event) => (
             <article
               key={event.id}
-              className="flex h-full flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
+              className="flex h-full flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:shadow-lg"
             >
               <div className="h-40 bg-gradient-to-br from-indigo-500 via-sky-500 to-purple-500" />
               <div className="flex flex-1 flex-col justify-between p-5">
@@ -61,6 +64,14 @@ export default function EventsPreview() {
               </div>
             </article>
           ))}
+        </div>
+        <div className="mt-10 flex justify-center">
+          <Link
+            href="/events/explore-events"
+            className="rounded-full bg-black px-6 py-3 text-sm font-medium text-white shadow-sm transition duration-300 hover:bg-gray-900 hover:shadow-md"
+          >
+            Explore Events
+          </Link>
         </div>
       </div>
     </section>

@@ -1,200 +1,237 @@
-import { useEffect, useState } from 'react';
-import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useState } from 'react';
+import {
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Spacing, Radius, FontSize, FontWeight } from '@/constants/theme';
 import EventCard from '@/components/EventCard';
 import type { CommunityEvent } from '@/lib/types';
 
+/* ─────────────────────────────────────────────────────────────
+   Local type that bundles resolved community info onto an event.
+──────────────────────────────────────────────────────────────── */
+type FeedEvent = CommunityEvent & {
+  _communityName?: string;
+  _communityLogo?: any;
+};
+
+/* ─────────────────────────────────────────────────────────────
+   Mock seed — shown when the backend returns no events.
+   Keeps the UI looking polished during demos / initial launch.
+──────────────────────────────────────────────────────────────── */
+const now = Date.now();
+const MOCK_EVENTS: FeedEvent[] = [
+  {
+    id: 'mock-edt',
+    title: 'Tanışma Dansı & Workshop',
+    community_id: 'edt',
+    description:
+      'Eşli dans dünyasına ilk adımını atmak için mükemmel bir fırsat! Salsa, Tango, Bachata ve daha fazlası seni bekliyor.',
+    location: 'ODTÜ Kültür ve Kongre Merkezi',
+    starts_at: new Date(now + 3 * 86_400_000).toISOString(),
+    is_paid: true,
+    ticket_price: 50,
+    _communityName: 'Eşli Danslar Topluluğu',
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    _communityLogo: require('../../assets/images/edt_logo.jpg'),
+  },
+  {
+    id: 'mock-vt',
+    title: 'Vaka Analizi Yarışması',
+    community_id: 'vt',
+    description:
+      'Gerçek iş vakalarını analiz et, çözüm öner ve jüri karşısında sun. Kazananlar sertifika ve ödül alır.',
+    location: 'ODTÜ Mühendislik Fakültesi B-201',
+    starts_at: new Date(now + 7 * 86_400_000).toISOString(),
+    is_paid: false,
+    _communityName: 'ODTÜ Verimlilik Topluluğu',
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    _communityLogo: require('../../assets/images/vt_logo.jpg'),
+  },
+  {
+    id: 'mock-most',
+    title: 'C++ ile Oyun Geliştirme Workshop',
+    community_id: 'most',
+    description:
+      'Motorsport ekibiyle buluş: C++ tabanlı oyun mekaniği ve simülasyon sistemlerini sıfırdan öğren.',
+    location: 'ODTÜ Elektrik-Elektronik Mühendisliği EE-03',
+    starts_at: new Date(now + 14 * 86_400_000).toISOString(),
+    is_paid: false,
+    _communityName: 'METU Motorsport',
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    _communityLogo: require('../../assets/images/most_logo.jpg'),
+  },
+];
+
+/* ─────────────────────────────────────────────────────────────
+   Screen
+──────────────────────────────────────────────────────────────── */
 export default function HomeScreen() {
   const router = useRouter();
-  const [events, setEvents] = useState<CommunityEvent[]>([]);
-
-  useEffect(() => {
-    fetch('http://localhost:8080/api/events')
-      .then((r) => r.json())
-      .then(setEvents)
-      .catch(() => {});
-  }, []);
+  const insets = useSafeAreaInsets();
+  // Controlled demo feed: we intentionally do NOT merge backend events for now.
+  const [demoEvents] = useState<FeedEvent[]>(MOCK_EVENTS);
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Hero Section */}
-        <View style={styles.hero}>
-          <LinearGradient
-            colors={['rgba(99,102,241,0.15)', 'rgba(139,92,246,0.1)', 'transparent']}
-            style={StyleSheet.absoluteFill}
-          />
-          <View style={styles.badge}>
-            <View style={styles.badgeDot} />
-            <Text style={styles.badgeText}>Live on campus · Spring 2026</Text>
-          </View>
-          <Text style={styles.heroTitle}>
-            Discover{'\n'}Communities{'\n'}at METU.
-          </Text>
-          <Text style={styles.heroDesc}>
-            Explore student communities, join exciting events, and connect with people who share your
-            interests across the METU campus.
-          </Text>
-          <View style={styles.heroButtons}>
-            <Pressable style={styles.primaryBtn} onPress={() => router.push('/events' as any)}>
-              <Text style={styles.primaryBtnText}>Explore Events</Text>
-            </Pressable>
-            <Pressable style={styles.secondaryBtn} onPress={() => router.push('/communities' as any)}>
-              <Text style={styles.secondaryBtnText}>Join a Community</Text>
-            </Pressable>
-          </View>
+    <View style={styles.screen}>
+      {/* ─── Top bar ─── */}
+      <View style={[styles.topBar, { paddingTop: insets.top + 8 }]}>
+        <Text style={styles.logo}>
+          METU<Text style={styles.logoAccent}>Com</Text>
+        </Text>
+        <View style={styles.topRight}>
+          <Pressable style={styles.iconBtn} onPress={() => router.push('/events' as any)}>
+            <Ionicons name="search-outline" size={21} color={Colors.text} />
+          </Pressable>
+          <Pressable style={styles.iconBtn}>
+            <Ionicons name="notifications-outline" size={21} color={Colors.text} />
+          </Pressable>
         </View>
+      </View>
 
-        {/* Upcoming Events */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <View>
-              <Text style={styles.sectionTitle}>Upcoming Events</Text>
-              <Text style={styles.sectionSub}>Handpicked events from active student communities.</Text>
-            </View>
-            <Pressable onPress={() => router.push('/events' as any)}>
-              <Text style={styles.viewAll}>View all →</Text>
-            </Pressable>
-          </View>
-          <FlatList
-            data={events.slice(0, 4)}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.cardRow}
-            keyExtractor={(item) => String(item.id)}
-            renderItem={({ item }) => (
-              <View style={styles.cardWrapper}>
-                <EventCard event={item} />
-              </View>
-            )}
-            ListEmptyComponent={
-              <Text style={styles.emptyText}>No events yet or backend is offline.</Text>
-            }
+      {/* ─── Feed ─── */}
+      <FlatList
+        data={demoEvents}
+        keyExtractor={(item) => item.id}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.feedContainer}
+        ListHeaderComponent={<FeedHeader />}
+        renderItem={({ item }) => (
+          <EventCard
+            event={item}
+            communityName={item._communityName}
+            communityLogo={item._communityLogo}
           />
-        </View>
-
-        <View style={{ height: 40 }} />
-      </ScrollView>
-    </SafeAreaView>
+        )}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
+      />
+    </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.bg },
+/* ─── "for you" section label ─── */
+function FeedHeader() {
+  return (
+    <View style={styles.feedHeader}>
+      <Text style={styles.feedHeaderText}>for you</Text>
+      <View style={styles.feedHeaderDot} />
+    </View>
+  );
+}
 
-  hero: {
-    paddingHorizontal: Spacing.xxl,
-    paddingTop: Spacing.xxxxl,
-    paddingBottom: Spacing.xxxl,
+/* ─── Empty state ─── */
+function EmptyFeed() {
+  return (
+    <View style={styles.emptyBox}>
+      <Ionicons name="calendar-outline" size={40} color={Colors.textMuted} />
+      <Text style={styles.emptyTitle}>No events yet</Text>
+      <Text style={styles.emptyText}>
+        Events from communities you follow will appear here.
+      </Text>
+    </View>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Styles
+──────────────────────────────────────────────────────────────── */
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: Colors.bg,
+  },
+  centered: {
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  badge: {
+
+  /* ── Top bar ── */
+  topBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: Spacing.xxl,
+    paddingBottom: Spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+    backgroundColor: Colors.bg,
+  },
+  logo: {
+    fontSize: FontSize['2xl'],
+    fontWeight: FontWeight.extrabold,
+    color: Colors.text,
+    letterSpacing: -0.8,
+  },
+  logoAccent: {
+    color: Colors.metuRed,
+  },
+  topRight: {
+    flexDirection: 'row',
+    gap: Spacing.xs,
+  },
+  iconBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: Colors.bgElevated,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+
+  /* ── Feed ── */
+  feedContainer: {
+    paddingBottom: Spacing.xxxl,
+  },
+  separator: {
+    height: Spacing.lg,
+  },
+
+  /* ── Feed section header ── */
+  feedHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
-    backgroundColor: 'rgba(0,0,0,0.05)',
-    paddingHorizontal: Spacing.md,
-    paddingVertical: 5,
-    borderRadius: Radius.full,
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.06)',
-    marginBottom: Spacing.xxl,
-  },
-  badgeDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: Colors.emerald,
-  },
-  badgeText: {
-    fontSize: FontSize.xs,
-    fontWeight: FontWeight.medium,
-    color: Colors.textSecondary,
-  },
-  heroTitle: {
-    fontSize: FontSize['4xl'],
-    fontWeight: FontWeight.bold,
-    color: Colors.text,
-    textAlign: 'center',
-    letterSpacing: -1,
-    lineHeight: 44,
-    marginBottom: Spacing.lg,
-  },
-  heroDesc: {
-    fontSize: FontSize.base,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 24,
-    maxWidth: 340,
-    marginBottom: Spacing.xxl,
-  },
-  heroButtons: {
-    flexDirection: 'row',
-    gap: Spacing.md,
-  },
-  primaryBtn: {
-    backgroundColor: Colors.black,
     paddingHorizontal: Spacing.xxl,
-    paddingVertical: Spacing.md,
-    borderRadius: Radius.full,
+    paddingTop: Spacing.lg,
+    paddingBottom: Spacing.md,
   },
-  primaryBtnText: {
-    color: Colors.white,
+  feedHeaderText: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.medium,
+    color: Colors.textMuted,
+    letterSpacing: 0.4,
   },
-  secondaryBtn: {
-    borderWidth: 1,
-    borderColor: Colors.neutral300,
-    paddingHorizontal: Spacing.xxl,
-    paddingVertical: Spacing.md,
-    borderRadius: Radius.full,
-  },
-  secondaryBtnText: {
-    color: Colors.text,
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.medium,
+  feedHeaderDot: {
+    flex: 1,
+    height: 1,
+    backgroundColor: Colors.border,
   },
 
-  section: {
-    marginTop: Spacing.xxxl,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
+  /* ── Empty state ── */
+  emptyBox: {
+    alignItems: 'center',
+    gap: Spacing.md,
+    paddingVertical: 80,
     paddingHorizontal: Spacing.xxl,
-    marginBottom: Spacing.lg,
   },
-  sectionTitle: {
-    fontSize: FontSize.xl,
-    fontWeight: FontWeight.bold,
+  emptyTitle: {
+    fontSize: FontSize.lg,
+    fontWeight: FontWeight.semibold,
     color: Colors.text,
-  },
-  sectionSub: {
-    fontSize: FontSize.xs,
-    color: Colors.textMuted,
-    marginTop: 2,
-  },
-  viewAll: {
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.medium,
-    color: Colors.textMuted,
-  },
-  cardRow: {
-    paddingHorizontal: Spacing.xxl,
-    gap: Spacing.lg,
-  },
-  cardWrapper: {
-    width: 260,
   },
   emptyText: {
     fontSize: FontSize.sm,
     color: Colors.textMuted,
-    paddingHorizontal: Spacing.xxl,
+    textAlign: 'center',
+    lineHeight: 20,
   },
 });

@@ -1,53 +1,83 @@
+/**
+ * Per-scheme palette used by _layout.tsx to drive NavigationBar / StatusBar
+ * dynamically whenever the OS color-scheme changes.
+ */
+export const palette = {
+  dark: {
+    background: '#0a0a0f',
+    buttonStyle: 'light' as const,
+    statusBarStyle: 'light' as const,
+  },
+  light: {
+    background: '#ffffff',
+    buttonStyle: 'dark' as const,
+    statusBarStyle: 'dark' as const,
+  },
+} as const;
+
 export const Colors = {
-  // Backgrounds
-  bg: '#ffffff',
-  bgSecondary: '#f9fafb',       // gray-50
-  bgCard: '#ffffff',
-  bgDark: '#0f172a',            // slate-900
-  bgDarkCard: '#020617',        // slate-950/95
+  // ─── Dark surfaces (layered elevation) ───
+  bg: '#0a0a0f',
+  bgElevated: '#12121a',
+  bgCard: '#1a1a25',
+  bgCardHover: '#22222f',
+  bgInput: '#16161f',
 
-  // Text
-  text: '#111827',              // gray-900
-  textSecondary: '#6b7280',     // gray-500
-  textMuted: '#9ca3af',         // gray-400
-  textOnDark: '#f8fafc',        // slate-50
-  textOnDarkMuted: '#94a3b8',   // slate-400
+  // ─── Text on dark ───
+  text: '#f0f0f5',
+  textSecondary: '#9898a8',
+  textMuted: '#5c5c6e',
+  textOnAccent: '#ffffff',
 
-  // Accent / brand
-  indigo: '#6366f1',            // indigo-500
-  violet: '#8b5cf6',            // violet-500
-  fuchsia: '#d946ef',           // fuchsia-500
-  emerald: '#10b981',           // emerald-500
-  teal: '#14b8a6',              // teal-500
-  cyan: '#06b6d4',              // cyan-500
-  orange: '#f97316',            // orange-400
-  green: '#22c55e',             // green-500
+  // ─── Brand ───
+  metuRed: '#E30613',          // METU official red
+  metuRedLight: '#ff3b4a',     // lighter variant for highlights
+  metuRedDim: 'rgba(227,6,19,0.15)', // tinted background
 
-  // Neutrals (used for borders, inputs, filter chips)
+  // ─── Accent ───
+  indigo: '#818cf8',           // indigo-400 (brighter on dark)
+  violet: '#a78bfa',           // violet-400
+  fuchsia: '#e879f9',          // fuchsia-400
+  emerald: '#34d399',          // emerald-400
+  teal: '#2dd4bf',             // teal-400
+  cyan: '#22d3ee',             // cyan-400
+  orange: '#fb923c',           // orange-400
+  green: '#4ade80',            // green-400
+  rose: '#fb7185',             // rose-400
+  amber: '#fbbf24',            // amber-400
+  sky: '#38bdf8',              // sky-400
+
+  // ─── Neutrals ───
   neutral50: '#fafafa',
   neutral100: '#f5f5f5',
   neutral200: '#e5e5e5',
   neutral300: '#d4d4d4',
   neutral400: '#a3a3a3',
   neutral500: '#737373',
+  neutral600: '#525252',
   neutral700: '#404040',
   neutral800: '#262626',
   neutral900: '#171717',
 
-  // Borders
-  border: '#e5e7eb',            // gray-200
-  borderDark: '#1e293b',        // slate-800
+  // ─── Borders ───
+  border: '#1e1e2e',
+  borderSubtle: '#2a2a3a',
+  borderAccent: '#818cf820',
 
-  // Status
-  danger: '#ef4444',
+  // ─── Status ───
+  danger: '#f87171',
+  success: '#34d399',
   white: '#ffffff',
   black: '#000000',
 };
 
 export const Gradients = {
-  eventCardBg: ['#6366f1', '#d946ef', '#f97316'] as const,   // indigo → fuchsia → orange
-  communityCardBg: ['#10b981', '#14b8a6', '#06b6d4'] as const,    // emerald → teal → cyan
-  accentBtn: ['#6366f1', '#8b5cf6'] as const,                // indigo → violet
+  eventCardBg: ['#6366f1', '#a855f7', '#ec4899'] as const,
+  communityCardBg: ['#10b981', '#06b6d4', '#3b82f6'] as const,
+  accentBtn: ['#818cf8', '#a78bfa'] as const,
+  surface: ['#12121a', '#0a0a0f'] as const,
+  headerGlow: ['rgba(129,140,248,0.12)', 'rgba(168,85,247,0.06)', 'transparent'] as const,
+  cardShine: ['rgba(255,255,255,0.06)', 'rgba(255,255,255,0)'] as const,
 };
 
 export const Spacing = {
@@ -66,11 +96,12 @@ export const Radius = {
   md: 12,
   lg: 16,
   xl: 20,
-  '2xl': 16,   // rounded-2xl equivalent
+  '2xl': 24,
   full: 9999,
 };
 
 export const FontSize = {
+  xxs: 10,
   xs: 11,
   sm: 13,
   base: 15,

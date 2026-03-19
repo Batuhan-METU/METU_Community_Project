@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: Radius.lg,
-    backgroundColor: Colors.neutral100,
+    backgroundColor: Colors.bgCard,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: -32,
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   initial: { fontSize: FontSize.xl, fontWeight: FontWeight.bold, color: Colors.text },
   title: { fontSize: FontSize['2xl'], fontWeight: FontWeight.bold, color: Colors.text, textAlign: 'center' },
   categoryBadge: {
-    backgroundColor: Colors.neutral100,
+    backgroundColor: Colors.bgCard,
     paddingHorizontal: Spacing.md,
     paddingVertical: 5,
     borderRadius: Radius.full,

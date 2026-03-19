@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { BlurView } from 'expo-blur';
+import { StatusBar } from 'expo-status-bar';
 import { Spacing, Radius, FontSize, FontWeight } from '@/constants/theme';
 import { api } from '@/lib/api';
 
@@ -54,6 +55,7 @@ export default function RegisterScreen() {
       source={require('@/assets/images/kapak.jpg')}
       style={styles.bg}
       resizeMode="cover">
+      <StatusBar style="light" translucent backgroundColor="transparent" />
       <View style={styles.overlay} />
 
       <KeyboardAvoidingView

@@ -5,86 +5,11 @@ import Link from "next/link";
 import axiosClient from "@/api/axios";
 import type { MockEvent } from "../../lib/mockEvents";
 
- export default function EventsPreview() {
-   const [loading, setLoading] = useState(true);
-   const [events, setEvents] = useState<MockEvent[]>([]);
-
-   useEffect(() => {
-     let alive = true;
-     const run = async () => {
-      type ApiCommunity = { id: string | number; name: string };
-      type ApiEvent = {
-        id: string | number;
-        community_id: string | number;
-        title: string;
-        starts_at: string;
-        location?: string | null;
-        image_url?: string | null;
-        description?: string | null;
-        capacity?: number | null;
-      };
-
-       setLoading(true);
-        let lastError: string | null = null;
-       try {
-         const [eventsRes, communitiesRes] = await Promise.all([
-           axiosClient.get("/events"),
-           axiosClient.get("/communities"),
-         ]);
-
-        const communities = (communitiesRes.data || []) as ApiCommunity[];
-         const map: Record<string, string> = {};
-         for (const c of communities) map[String(c.id)] = c.name;
-
-         const apiEvents = eventsRes.data || [];
-        const mapped: MockEvent[] = (apiEvents.slice(0, 3) as ApiEvent[]).map((e) => ({
-           id: e.id,
-           title: e.title,
-           community: map[String(e.community_id)] || "",
-           date: e.starts_at,
-          location: e.location || "",
-          imageUrl: e.image_url,
-          description: e.description || "",
-           filledSeats: 0,
-           totalSeats: typeof e.capacity === "number" ? e.capacity : 0,
-           category: undefined,
-         }));
-
-         if (!alive) return;
-         setEvents(mapped);
-        } catch (e: unknown) {
-          const err = e as {
-            code?: string;
-            response?: { status?: number; data?: { error?: string } };
-            config?: { url?: string };
-            message?: string;
-          };
-          console.error("EventsPreview yükleme hatası:", {
-            code: err?.code,
-            message: err?.message,
-            url: err?.config?.url,
-            responseStatus: err?.response?.status,
-            responseError: err?.response?.data?.error,
-            fullError: err,
-          });
-          lastError =
-            err?.response?.data?.error ||
-            err?.message ||
-            (err?.response ? "Sunucu hatası oluştu." : "Backend sunucusuna bağlanılamıyor");
-          alert(lastError);
-        } finally {
-          if (!alive) return;
-          setLoading(false);
-       }
-     };
-
-     run();
-     return () => {
-       alive = false;
-     };
-   }, []);
-
-   const previewEvents = events;
+export default function EventsPreview() {
+  const sortedEvents = [...mockEvents].sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+  const upcomingEvents = sortedEvents.slice(0, 3);
 
   return (
     <section className="bg-gray-100 py-24">
@@ -100,7 +25,7 @@ import type { MockEvent } from "../../lib/mockEvents";
             </p>
           </div>
           <Link
-            href="/events"
+            href="/events/explore-events"
             className="text-sm font-medium text-gray-700 underline-offset-4 transition hover:text-gray-900 hover:underline"
           >
             View all events
@@ -109,14 +34,10 @@ import type { MockEvent } from "../../lib/mockEvents";
 
         {/* Event cards */}
         <div className="mt-10 grid gap-8 md:grid-cols-3">
-          {loading ? (
-            <p className="col-span-full py-10 text-center text-sm text-gray-600">
-              Yükleniyor...
-            </p>
-          ) : previewEvents.map((event) => (
+          {upcomingEvents.map((event) => (
             <article
               key={event.id}
-              className="flex h-full flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
+              className="flex h-full flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:shadow-lg"
             >
               {event.imageUrl ? (
                 <img
@@ -155,6 +76,14 @@ import type { MockEvent } from "../../lib/mockEvents";
               </div>
             </article>
           ))}
+        </div>
+        <div className="mt-10 flex justify-center">
+          <Link
+            href="/events/explore-events"
+            className="rounded-full bg-black px-6 py-3 text-sm font-medium text-white shadow-sm transition duration-300 hover:bg-gray-900 hover:shadow-md"
+          >
+            Explore Events
+          </Link>
         </div>
       </div>
     </section>

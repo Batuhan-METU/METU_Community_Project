@@ -18,13 +18,14 @@ export default async function EventDetailPage({
     notFound();
   }
 
-  const formattedDate = new Date(event.date).toLocaleDateString("tr-TR", {
-    day: "2-digit",
-    month: "long",
+  const formattedDate = new Date(event.date).toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
     year: "numeric",
   });
 
-  const formattedTime = new Date(event.date).toLocaleTimeString("tr-TR", {
+  const formattedTime = new Date(event.date).toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
   });
@@ -35,64 +36,98 @@ export default async function EventDetailPage({
   );
 
   return (
-    <div className="mx-auto max-w-2xl px-6 py-12">
-      <Link
-        href="/events"
-        className="text-sm text-neutral-500 transition-colors hover:text-indigo-400"
-      >
-        &larr; Back to events
-      </Link>
+    <div className="relative isolate min-h-screen overflow-hidden">
+      {/*
+        Her etkinlik için mock’taki event.image (ör. ML → /images/event-images/ai.jpg).
+        Blur SADECE bu sayfa gövdesinde (main); navbar/footer layout’ta ayrı, etkilenmez.
+        1) Bu alanı dolduran bulanık görsel
+        2) Okunabilirlik örtüsü
+        3) Üstte beyaz kart
+      */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        <img
+          src={event.image}
+          alt=""
+          className="h-full w-full scale-110 object-cover opacity-95 blur-lg"
+          aria-hidden
+        />
+      </div>
+      <div className="pointer-events-none absolute inset-0 z-[1] bg-white/30" />
 
-      <article className="mt-8 rounded-2xl bg-neutral-900 p-6 ring-1 ring-neutral-800 md:p-8">
-        <div className="relative mb-6 h-48 overflow-hidden rounded-xl">
-          <div className="h-full w-full bg-gradient-to-br from-indigo-500 via-fuchsia-500 to-orange-400" />
+      <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-16">
+        <div className="w-full max-w-3xl">
+          <Link
+            href="/events/explore-events"
+            className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
+          >
+            <span aria-hidden>&larr;</span> Back
+          </Link>
+
+          <article className="relative w-full overflow-hidden rounded-2xl bg-white shadow-2xl">
+            {/*
+              Kart üstü: büyük banner; görsel object-cover ile alanı baştan sona doldurur.
+            */}
+            <div className="relative h-64 w-full overflow-hidden bg-neutral-200 sm:h-72 md:h-80 lg:h-96">
+              <img
+                src={event.image}
+                alt={event.title}
+                className="absolute inset-0 h-full w-full object-cover object-center"
+                loading="eager"
+                decoding="async"
+              />
+            </div>
+
+            <div className="space-y-5 p-6 md:space-y-6 md:p-8">
+              <span className="inline-flex rounded-full bg-indigo-100 px-3 py-1 text-sm font-medium text-indigo-600">
+                {event.category}
+              </span>
+
+              <h1 className="text-3xl font-bold leading-tight text-gray-900 md:text-4xl">
+                {event.title}
+              </h1>
+
+              <div className="flex flex-col gap-3 text-base text-gray-600 md:flex-row md:flex-wrap md:items-center md:gap-x-8 md:gap-y-2 md:text-lg">
+                <span>
+                  <span className="font-medium text-gray-500">When: </span>
+                  {formattedDate} &middot; {formattedTime}
+                </span>
+                <span>
+                  <span className="font-medium text-gray-500">Where: </span>
+                  {event.location}
+                </span>
+              </div>
+
+              <p className="text-sm text-gray-500 md:text-base">
+                Hosted by{" "}
+                <span className="font-medium text-gray-700">{event.club}</span>
+              </p>
+
+              <p className="text-base leading-relaxed text-gray-700 md:text-lg">
+                {event.description}
+              </p>
+
+              <div>
+                <div className="flex items-center justify-between text-xs font-medium text-gray-500 md:text-sm">
+                  <span>Capacity</span>
+                  <span>
+                    {event.filledSeats}/{event.totalSeats} seats
+                  </span>
+                </div>
+                <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-200">
+                  <div
+                    className="h-full rounded-full bg-indigo-500 transition-all duration-500"
+                    style={{ width: `${capacityPercent}%` }}
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3 pt-1">
+                <JoinEventButton />
+              </div>
+            </div>
+          </article>
         </div>
-
-        <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
-          {event.club}
-        </p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight text-white">
-          {event.title}
-        </h1>
-
-        <div className="mt-6 grid gap-px overflow-hidden rounded-xl bg-neutral-800 text-sm sm:grid-cols-2">
-          <div className="bg-neutral-900 p-4">
-            <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
-              Date &amp; Time
-            </p>
-            <p className="mt-1 text-neutral-200">
-              {formattedDate}, {formattedTime}
-            </p>
-          </div>
-          <div className="bg-neutral-900 p-4">
-            <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
-              Location
-            </p>
-            <p className="mt-1 text-neutral-200">{event.location}</p>
-          </div>
-        </div>
-
-        <p className="mt-6 text-base leading-7 text-neutral-400">
-          {event.description}
-        </p>
-
-        <div className="mt-6">
-          <div className="flex items-center justify-between text-xs text-neutral-500">
-            <span>Capacity</span>
-            <span>
-              {event.filledSeats}/{event.totalSeats} seats
-            </span>
-          </div>
-          <div className="mt-1.5 h-1.5 w-full rounded-full bg-neutral-800">
-            <div
-              className="h-full rounded-full bg-indigo-500 transition-all duration-500"
-              style={{ width: `${capacityPercent}%` }}
-            />
-          </div>
-        </div>
-
-        <JoinEventButton />
-      </article>
+      </div>
     </div>
   );
 }

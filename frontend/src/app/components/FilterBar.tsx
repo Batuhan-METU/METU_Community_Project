@@ -11,11 +11,15 @@ type FilterBarProps = {
 
 const categories: FilterCategory[] = [
   "All",
+  "Technology",
+  "Science",
   "Engineering",
   "Business",
   "Art",
-  "Music",
-  "Science",
+  "Entertainment",
+  "Music & Dance",
+  "Environment",
+  "Career",
 ];
 
 export default function FilterBar({

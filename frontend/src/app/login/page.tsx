@@ -2,14 +2,53 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useAuth } from "../../context/AuthContext";
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { login } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    document.cookie = "auth-token=logged-in; path=/";
-    router.push("/events");
+    setIsSubmitting(true);
+    setErrorMessage("");
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const payload = await response.json();
+
+      if (!response.ok) {
+        setErrorMessage(payload.error || "Login failed.");
+        return;
+      }
+
+      const accessToken: string | undefined = payload?.session?.access_token;
+      if (!accessToken) {
+        setErrorMessage("Login response did not include an access token.");
+        return;
+      }
+
+      await login(accessToken);
+      router.push("/");
+    } catch {
+      setErrorMessage("Sunucuya ulasilamadi. Lutfen tekrar deneyin.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -43,7 +82,10 @@ export default function LoginPage() {
                 type="email"
                 autoComplete="email"
                 placeholder="you@metu.edu.tr"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
                 className="w-full rounded-lg border border-gray-300 bg-white/80 px-4 py-2 text-sm text-gray-900 outline-none placeholder:text-gray-500 focus:ring-2 focus:ring-white"
+                required
               />
             </div>
 
@@ -60,15 +102,23 @@ export default function LoginPage() {
                 type="password"
                 autoComplete="current-password"
                 placeholder="Enter your password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
                 className="w-full rounded-lg border border-gray-300 bg-white/80 px-4 py-2 text-sm text-gray-900 outline-none placeholder:text-gray-500 focus:ring-2 focus:ring-white"
+                required
               />
             </div>
 
+            {errorMessage ? (
+              <p className="text-sm font-medium text-red-200">{errorMessage}</p>
+            ) : null}
+
             <button
               type="submit"
+              disabled={isSubmitting}
               className="mt-2 w-full rounded-full bg-white px-6 py-3 text-sm font-medium text-black transition hover:bg-gray-200"
             >
-              Login
+              {isSubmitting ? "Logging in..." : "Login"}
             </button>
           </form>
 

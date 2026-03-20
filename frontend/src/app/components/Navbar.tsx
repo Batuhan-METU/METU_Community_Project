@@ -1,10 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { isAuthenticated, isLoading, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    router.push("/");
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/90 backdrop-blur">
@@ -43,20 +51,42 @@ export default function Navbar() {
           })}
         </nav>
 
-        {/* Right: auth buttons */}
+        {/* Right: auth actions */}
         <div className="flex items-center gap-3">
-          <Link
-            href="/login"
-            className="hidden rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition duration-200 hover:bg-gray-50 md:inline-flex"
-          >
-            Login
-          </Link>
-          <Link
-            href="/register"
-            className="inline-flex rounded-full bg-black px-4 py-2 text-sm font-medium text-white transition duration-200 hover:bg-gray-800"
-          >
-            Sign Up
-          </Link>
+          {isLoading ? (
+            <div className="h-9 w-24 animate-pulse rounded-full bg-gray-200" aria-hidden />
+          ) : isAuthenticated ? (
+            <>
+              <Link
+                href="/profile"
+                className="hidden rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition duration-200 hover:bg-gray-50 md:inline-flex"
+              >
+                Profil
+              </Link>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="inline-flex rounded-full bg-black px-4 py-2 text-sm font-medium text-white transition duration-200 hover:bg-gray-800"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="hidden rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition duration-200 hover:bg-gray-50 md:inline-flex"
+              >
+                Login
+              </Link>
+              <Link
+                href="/register"
+                className="inline-flex rounded-full bg-black px-4 py-2 text-sm font-medium text-white transition duration-200 hover:bg-gray-800"
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>

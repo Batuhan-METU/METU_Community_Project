@@ -2,8 +2,8 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 export function middleware(request: NextRequest) {
-  // Prototype auth check: treat this cookie as logged-in flag.
-  const isLoggedIn = request.cookies.get("auth-token")?.value === "logged-in";
+  const token = request.cookies.get("auth_token")?.value;
+  const isLoggedIn = Boolean(token);
 
   if (!isLoggedIn) {
     const loginUrl = new URL("/login", request.url);
@@ -15,6 +15,6 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/events/:path*", "/profile/:path*"],
+  matcher: ["/dashboard/:path*", "/profile/:path*"],
 };
 

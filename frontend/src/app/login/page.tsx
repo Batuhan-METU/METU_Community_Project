@@ -1,19 +1,36 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
 
-export default function LoginPage() {
+type LoginPayload = {
+  error?: string;
+  user?: {
+    id: string;
+    email?: string | null;
+    user_metadata?: { full_name?: string };
+  };
+  session?: {
+    access_token: string;
+    refresh_token?: string;
+    expires_at?: number;
+  };
+};
+
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const registeredHint = searchParams.get("message");
 
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -26,26 +43,46 @@ export default function LoginPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: email.trim(), password }),
       });
 
-      const payload = await response.json();
+      let payload: LoginPayload;
+      try {
+        payload = (await response.json()) as LoginPayload;
+      } catch {
+        setErrorMessage("Could not read the server response.");
+        return;
+      }
 
       if (!response.ok) {
-        setErrorMessage(payload.error || "Login failed.");
+        setErrorMessage(
+          payload.error ||
+            (response.status === 401
+              ? "Invalid email or password."
+              : "Sign-in failed.")
+        );
         return;
       }
 
-      const accessToken: string | undefined = payload?.session?.access_token;
+      const accessToken = payload?.session?.access_token;
       if (!accessToken) {
-        setErrorMessage("Login response did not include an access token.");
+        setErrorMessage("Could not create a session. Please try again.");
         return;
       }
 
-      await login(accessToken);
+      const userHint =
+        payload.user != null
+          ? {
+              id: payload.user.id,
+              email: payload.user.email ?? undefined,
+              full_name: payload.user.user_metadata?.full_name,
+            }
+          : null;
+
+      await login(accessToken, userHint);
       router.push("/");
     } catch {
-      setErrorMessage("Sunucuya ulasilamadi. Lutfen tekrar deneyin.");
+      setErrorMessage("Could not reach the server. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -67,6 +104,15 @@ export default function LoginPage() {
           <p className="mt-2 text-sm text-white/90">
             Access events and your personal profile
           </p>
+
+          {registeredHint ? (
+            <p
+              className="mt-4 rounded-lg bg-white/15 px-3 py-2 text-sm text-white/95"
+              role="status"
+            >
+              {registeredHint}
+            </p>
+          ) : null}
 
           <form onSubmit={handleLogin} className="mt-6 space-y-4">
             <div>
@@ -116,9 +162,19 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="mt-2 w-full rounded-full bg-white px-6 py-3 text-sm font-medium text-black transition hover:bg-gray-200"
+              className="mt-2 flex w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-medium text-black transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-70"
             >
-              {isSubmitting ? "Logging in..." : "Login"}
+              {isSubmitting ? (
+                <>
+                  <span
+                    className="h-4 w-4 animate-spin rounded-full border-2 border-gray-400 border-t-gray-900"
+                    aria-hidden
+                  />
+                  <span>Loading...</span>
+                </>
+              ) : (
+                "Log in"
+              )}
             </button>
           </form>
 
@@ -128,11 +184,25 @@ export default function LoginPage() {
               href="/register"
               className="font-medium text-white underline-offset-2 hover:underline"
             >
-              Register
+              Sign up
             </Link>
           </p>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-neutral-950 text-white">
+          <span className="h-8 w-8 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }

@@ -7,7 +7,7 @@ import { useAuth } from "../../context/AuthContext";
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { isAuthenticated, isLoading, logout } = useAuth();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
 
   const handleLogout = () => {
     logout();
@@ -52,23 +52,28 @@ export default function Navbar() {
         </nav>
 
         {/* Right: auth actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex min-h-[2.25rem] items-center gap-3">
           {isLoading ? (
-            <div className="h-9 w-24 animate-pulse rounded-full bg-gray-200" aria-hidden />
+            <div
+              className="h-9 w-28 animate-pulse rounded-full bg-gray-200"
+              aria-hidden
+              aria-busy="true"
+            />
           ) : isAuthenticated ? (
             <>
               <Link
                 href="/profile"
-                className="hidden rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition duration-200 hover:bg-gray-50 md:inline-flex"
+                title={user?.full_name ?? user?.email ?? "Your profile"}
+                className="inline-flex rounded-full border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition duration-200 hover:bg-gray-50 md:px-4"
               >
-                Profil
+                Profile
               </Link>
               <button
                 type="button"
                 onClick={handleLogout}
-                className="inline-flex rounded-full bg-black px-4 py-2 text-sm font-medium text-white transition duration-200 hover:bg-gray-800"
+                className="inline-flex rounded-full bg-black px-3 py-2 text-sm font-medium text-white transition duration-200 hover:bg-gray-800 md:px-4"
               >
-                Logout
+                Log out
               </button>
             </>
           ) : (
@@ -77,13 +82,13 @@ export default function Navbar() {
                 href="/login"
                 className="hidden rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition duration-200 hover:bg-gray-50 md:inline-flex"
               >
-                Login
+                Log in
               </Link>
               <Link
                 href="/register"
-                className="inline-flex rounded-full bg-black px-4 py-2 text-sm font-medium text-white transition duration-200 hover:bg-gray-800"
+                className="inline-flex rounded-full bg-black px-3 py-2 text-sm font-medium text-white transition duration-200 hover:bg-gray-800 md:px-4"
               >
-                Sign Up
+                Sign up
               </Link>
             </>
           )}

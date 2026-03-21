@@ -1,6 +1,6 @@
 const profiles = [
   {
-    name: "Ece Yılmaz",
+    name: "Ece Yilmaz",
     department: "Computer Engineering",
     bio: "AI & Robotics Club lead. Organizing weekly meetups on AI and real-world projects.",
   },

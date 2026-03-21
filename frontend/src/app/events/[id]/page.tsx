@@ -38,11 +38,9 @@ export default async function EventDetailPage({
   return (
     <div className="relative isolate min-h-screen overflow-hidden">
       {/*
-        Her etkinlik için mock’taki event.image (ör. ML → /images/event-images/ai.jpg).
-        Blur SADECE bu sayfa gövdesinde (main); navbar/footer layout’ta ayrı, etkilenmez.
-        1) Bu alanı dolduran bulanık görsel
-        2) Okunabilirlik örtüsü
-        3) Üstte beyaz kart
+        Full-page blurred background from mock event.image (e.g. ML → /images/event-images/ai.jpg).
+        Blur applies only to this page body (main); navbar/footer in layout stay sharp.
+        1) Blurred fill image 2) Readability overlay 3) White card on top
       */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
         <img
@@ -65,7 +63,7 @@ export default async function EventDetailPage({
 
           <article className="relative w-full overflow-hidden rounded-2xl bg-white shadow-2xl">
             {/*
-              Kart üstü: büyük banner; görsel object-cover ile alanı baştan sona doldurur.
+              Top banner: large hero; image uses object-cover to fill the area.
             */}
             <div className="relative h-64 w-full overflow-hidden bg-neutral-200 sm:h-72 md:h-80 lg:h-96">
               <img

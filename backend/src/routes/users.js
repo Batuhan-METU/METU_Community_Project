@@ -27,10 +27,22 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ error: error.message });
     }
 
-    res.status(201).json({
-      message: "Kayıt başarılı! Lütfen e-postanızı doğrulayın.",
+    const session = data.session;
+    const payload = {
+      message: session
+        ? "Kayıt başarılı."
+        : "Kayıt başarılı! Lütfen e-postanızı doğrulayın.",
       user: data.user,
-    });
+      session: session
+        ? {
+            access_token: session.access_token,
+            refresh_token: session.refresh_token,
+            expires_at: session.expires_at,
+          }
+        : null,
+    };
+
+    res.status(201).json(payload);
   } catch (err) {
     res.status(500).json({ error: "Sunucu hatası: " + err.message });
   }
@@ -54,6 +66,12 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ error: error.message });
     }
 
+    if (!data.session) {
+      return res.status(401).json({
+        error: "Oturum oluşturulamadı. Lütfen tekrar deneyin.",
+      });
+    }
+
     res.json({
       user: data.user,
       session: {
@@ -63,7 +81,7 @@ router.post("/login", async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(500).json({ error: "Sunucu hatası." });
+    res.status(500).json({ error: "Sunucu hatası: " + err.message });
   }
 });
 

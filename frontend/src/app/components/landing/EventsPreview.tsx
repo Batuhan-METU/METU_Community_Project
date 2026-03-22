@@ -39,7 +39,7 @@ export default function EventsPreview() {
               <div className="flex flex-1 flex-col justify-between p-5">
                 <div className="space-y-2">
                   <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
-                    {new Date(event.date).toLocaleDateString("tr-TR", {
+                    {new Date(event.date).toLocaleDateString("en-US", {
                       day: "2-digit",
                       month: "short",
                     })}{" "}

@@ -21,12 +21,12 @@ export default function EventCard({
   totalSeats,
   joined = false,
 }: EventCardProps) {
-  const formattedDate = new Date(date).toLocaleDateString("tr-TR", {
+  const formattedDate = new Date(date).toLocaleDateString("en-US", {
     day: "2-digit",
     month: "short",
     year: "numeric",
   });
-  const formattedTime = new Date(date).toLocaleTimeString("tr-TR", {
+  const formattedTime = new Date(date).toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
   });

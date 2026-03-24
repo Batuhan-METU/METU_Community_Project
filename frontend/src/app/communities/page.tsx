@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 
 const CATEGORIES = [
@@ -66,21 +67,25 @@ export default function CommunitiesPage() {
           </p>
         ) : (
           <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
-            {filteredCategories.map((category) => (
-              <div
-                key={category.name}
-                className="relative h-52 cursor-pointer overflow-hidden rounded-xl transition duration-300 hover:scale-[1.03]"
-              >
-                <div
-                  className="absolute inset-0 h-full w-full bg-cover bg-center bg-no-repeat"
-                  style={{ backgroundImage: `url(${category.image})` }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                <h2 className="absolute bottom-4 left-4 text-xl font-semibold text-white">
-                  {category.name}
-                </h2>
-              </div>
-            ))}
+            {filteredCategories.map((category) => {
+              const slug = category.name.toLowerCase();
+              return (
+                <Link
+                  key={category.name}
+                  href={`/communities/${slug}`}
+                  className="group relative h-52 overflow-hidden rounded-xl transition duration-300 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+                >
+                  <div
+                    className="absolute inset-0 h-full w-full bg-cover bg-center bg-no-repeat transition duration-300 group-hover:scale-110"
+                    style={{ backgroundImage: `url(${category.image})` }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent transition duration-300 group-hover:from-black/75 group-hover:to-black/20" />
+                  <h2 className="absolute bottom-4 left-4 text-xl font-semibold text-white">
+                    {category.name}
+                  </h2>
+                </Link>
+              );
+            })}
           </div>
         )}
       </section>

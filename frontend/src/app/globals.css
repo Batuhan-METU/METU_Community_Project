@@ -45,3 +45,18 @@ body {
 .animate-logoScroll {
   animation: logoScroll 25s linear infinite;
 }
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 500ms ease-out both;
+}

@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { Colors, Spacing, FontSize, FontWeight } from '@/constants/theme';
-import EventCard from '@/components/EventCard';
+import CompactEventCard from '@/components/CompactEventCard';
 import SearchInput from '@/components/SearchInput';
 import FilterChips from '@/components/FilterChips';
+import { api } from '@/lib/api';
+import { MOCK_EVENTS_FOR_SCREEN, type EventsScreenEvent } from '@/constants/mockEvents';
 import type { CommunityEvent, FilterCategory } from '@/lib/types';
 
 export default function EventsScreen() {
@@ -12,25 +15,45 @@ export default function EventsScreen() {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<FilterCategory>('All');
 
+  /* Background refresh only — never blocks UI; mocks show instantly while events=[] */
   useEffect(() => {
-    fetch('http://localhost:8080/api/events')
-      .then((r) => r.json())
-      .then(setEvents)
-      .catch(() => {});
+    let cancelled = false;
+    api
+      .getEvents()
+      .then((data) => {
+        if (cancelled) return;
+        const list = data as CommunityEvent[];
+        setEvents(list);
+        if (list.length === 0) setCategory('All');
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setEvents([]);
+        setCategory('All');
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  const sourceEvents = useMemo((): CommunityEvent[] => {
+    return events.length > 0 ? events : MOCK_EVENTS_FOR_SCREEN;
+  }, [events]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return events.filter((e) => {
-      const matchCat = category === 'All' || e.category === category;
+    return sourceEvents.filter((e) => {
+      const ev = e as CommunityEvent & { category?: string; community?: string };
+      const matchCat = category === 'All' || ev.category === category;
       const matchSearch =
         !q ||
         e.title.toLowerCase().includes(q) ||
-        e.community?.toLowerCase().includes(q) ||
-        e.location?.toLowerCase().includes(q);
+        (ev.community && ev.community.toLowerCase().includes(q)) ||
+        (e.location && e.location.toLowerCase().includes(q)) ||
+        (e.description && e.description.toLowerCase().includes(q));
       return matchCat && matchSearch;
     });
-  }, [events, search, category]);
+  }, [sourceEvents, search, category]);
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -50,19 +73,29 @@ export default function EventsScreen() {
         data={filtered}
         numColumns={2}
         keyExtractor={(item) => String(item.id)}
-        contentContainerStyle={styles.grid}
-        columnWrapperStyle={styles.gridRow}
+        contentContainerStyle={[styles.grid, filtered.length === 0 && styles.gridEmpty]}
+        columnWrapperStyle={filtered.length > 0 ? styles.gridRow : undefined}
         showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <View style={styles.gridItem}>
-            <EventCard event={item} />
-          </View>
-        )}
-        ListEmptyComponent={
-          <Text style={styles.empty}>No events found.</Text>
-        }
+        renderItem={({ item }) => {
+          const row = item as EventsScreenEvent;
+          return <CompactEventCard event={item} communityName={row.community} />;
+        }}
+        ListEmptyComponent={<EventsEmptyState />}
       />
     </SafeAreaView>
+  );
+}
+
+function EventsEmptyState() {
+  return (
+    <View style={styles.emptyWrap}>
+      <View style={styles.emptyIconCircle}>
+        <Ionicons name="calendar-outline" size={40} color={Colors.textMuted} />
+      </View>
+      <Text style={styles.emptyHeadline}>Nothing here yet</Text>
+      <Text style={styles.emptySub}>No events found</Text>
+      <Text style={styles.emptyHint}>Try another category or adjust your search.</Text>
+    </View>
   );
 }
 
@@ -91,20 +124,55 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.xxl,
   },
   grid: {
-    paddingHorizontal: Spacing.xxl,
+    paddingHorizontal: Spacing.lg,
     paddingBottom: 40,
+    flexGrow: 1,
+  },
+  gridEmpty: {
+    flexGrow: 1,
+    justifyContent: 'center',
   },
   gridRow: {
     gap: Spacing.md,
     marginBottom: Spacing.md,
   },
-  gridItem: {
-    flex: 1,
+  emptyWrap: {
+    width: '100%',
+    paddingVertical: Spacing.xxxl,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  empty: {
+  emptyIconCircle: {
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    backgroundColor: Colors.bgElevated,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: Spacing.xl,
+  },
+  emptyHeadline: {
+    fontSize: FontSize['2xl'],
+    fontWeight: FontWeight.bold,
+    color: Colors.textMuted,
+    opacity: 0.45,
+    letterSpacing: -0.5,
+    marginBottom: Spacing.sm,
+  },
+  emptySub: {
+    fontSize: FontSize.lg,
+    fontWeight: FontWeight.semibold,
+    color: Colors.text,
+    textAlign: 'center',
+  },
+  emptyHint: {
     fontSize: FontSize.sm,
     color: Colors.textMuted,
     textAlign: 'center',
-    marginTop: 40,
+    marginTop: Spacing.md,
+    maxWidth: 260,
+    lineHeight: 20,
   },
 });

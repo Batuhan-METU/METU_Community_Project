@@ -1,9 +1,12 @@
 export type EventCategory =
   | 'Engineering'
+  | 'Technology'
   | 'Business'
   | 'Art'
   | 'Music'
-  | 'Science';
+  | 'Science'
+  | 'Sports'
+  | 'Entertainment';
 
 /** Shape returned by GET /api/events */
 export type CommunityEvent = {

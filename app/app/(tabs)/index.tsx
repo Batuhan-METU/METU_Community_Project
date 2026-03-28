@@ -1,12 +1,5 @@
 import { useState } from 'react';
-import {
-  ActivityIndicator,
-  FlatList,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -152,12 +145,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  /* ── Top bar ── */
+  /* ── Top bar (px-4 = 16 — aligns with feed) ── */
   topBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: Spacing.xxl,
+    paddingHorizontal: Spacing.lg,
     paddingBottom: Spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
@@ -187,8 +180,9 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
   },
 
-  /* ── Feed ── */
+  /* ── Feed — horizontal inset so header + cards don’t touch screen edges ── */
   feedContainer: {
+    paddingHorizontal: Spacing.lg,
     paddingBottom: Spacing.xxxl,
   },
   separator: {
@@ -200,7 +194,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
-    paddingHorizontal: Spacing.xxl,
     paddingTop: Spacing.lg,
     paddingBottom: Spacing.md,
   },

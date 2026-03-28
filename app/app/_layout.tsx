@@ -54,17 +54,30 @@ export default function RootLayout() {
     return () => { cancelled = true; };
   }, []);
 
-  /* ─── Android system navigation bar — reacts to scheme changes ─── */
+  /* ─── Android nav bar: force dark immediately on cold start ─── */
   useEffect(() => {
     if (Platform.OS !== 'android') return;
-    const scheme = isDark ? palette.dark : palette.light;
-    (async () => {
+    void (async () => {
       try {
-        await NavigationBar.setBackgroundColorAsync(scheme.background);
-        await NavigationBar.setButtonStyleAsync(scheme.buttonStyle);
-      } catch {
-        // Best-effort: silently ignore on unsupported devices/platforms.
-      }
+        await NavigationBar.setBackgroundColorAsync('#0a0a0f');
+        await NavigationBar.setButtonStyleAsync('light');
+      } catch { /* best-effort */ }
+    })();
+  }, []); // empty dep → runs once at mount, before any frame is painted
+
+  /* ─── Android nav bar: keep in sync when OS scheme changes ─── */
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
+    void (async () => {
+      try {
+        if (isDark) {
+          await NavigationBar.setBackgroundColorAsync('#0a0a0f');
+          await NavigationBar.setButtonStyleAsync('light');
+        } else {
+          await NavigationBar.setBackgroundColorAsync(palette.light.background);
+          await NavigationBar.setButtonStyleAsync(palette.light.buttonStyle);
+        }
+      } catch { /* best-effort */ }
     })();
   }, [isDark]);
 

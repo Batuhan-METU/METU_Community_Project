@@ -1,9 +1,11 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import { Image, ImageSourcePropType, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Spacing, Radius, FontSize, FontWeight } from '@/constants/theme';
 import type { CommunityEvent } from '@/lib/types';
+
+/** Tailwind red-600 @ 30% opacity — subtle accent border */
+const RED_BORDER_SUBTLE = 'rgba(220, 38, 38, 0.3)';
 
 type Props = {
   event: CommunityEvent;
@@ -50,44 +52,39 @@ export default function EventCard({ event, communityName, communityLogo }: Props
         </Pressable>
       </View>
 
-      {/* ─── Hero gradient ─── */}
+      {/* ─── Title block — deep dark surface, no heavy gradient ─── */}
       <Pressable onPress={() => router.push(`/event/${event.id}`)}>
-        <LinearGradient
-          colors={['#E30613', '#6b0008', '#0a0a0f']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.hero}>
+        <View style={styles.hero}>
+          <View style={styles.heroTopRow}>
+            {d ? (
+              <View style={styles.dateBadge}>
+                <Text style={styles.dateDay}>{dayNum}</Text>
+                <Text style={styles.dateMonth}>{monthShort}</Text>
+              </View>
+            ) : (
+              <View />
+            )}
 
-          {/* Date chip — top left */}
-          {d && (
-            <View style={styles.dateBadge}>
-              <Text style={styles.dateDay}>{dayNum}</Text>
-              <Text style={styles.dateMonth}>{monthShort}</Text>
-            </View>
-          )}
+            {event.is_paid ? (
+              <View style={styles.priceTag}>
+                <Ionicons name="pricetag-outline" size={11} color={Colors.metuRed} />
+                <Text style={styles.priceTagText}>
+                  {event.ticket_price != null ? `${event.ticket_price} ₺` : 'Paid'}
+                </Text>
+              </View>
+            ) : null}
+          </View>
 
-          {/* Paid badge — top right */}
-          {event.is_paid ? (
-            <View style={styles.paidBadge}>
-              <Ionicons name="ticket-outline" size={11} color="#fff" />
-              <Text style={styles.paidBadgeText}>
-                {event.ticket_price ? `${event.ticket_price} ₺` : 'Paid'}
-              </Text>
-            </View>
-          ) : null}
-
-          {/* Title — bottom */}
           <View style={styles.heroBottom}>
             <Text style={styles.heroTitle} numberOfLines={3}>
               {event.title}
             </Text>
           </View>
-        </LinearGradient>
+        </View>
       </Pressable>
 
       {/* ─── Content ─── */}
       <View style={styles.content}>
-        {/* Action row */}
         <View style={styles.actionRow}>
           <View style={styles.actionsLeft}>
             <Pressable hitSlop={8} style={styles.actionBtn}>
@@ -105,7 +102,6 @@ export default function EventCard({ event, communityName, communityLogo }: Props
           </Pressable>
         </View>
 
-        {/* Description */}
         {event.description ? (
           <Text style={styles.desc} numberOfLines={2}>
             <Text style={styles.descAuthor}>{authorName} </Text>
@@ -113,8 +109,7 @@ export default function EventCard({ event, communityName, communityLogo }: Props
           </Text>
         ) : null}
 
-        {/* Time + location */}
-        {(timeStr || event.location) ? (
+        {timeStr || event.location ? (
           <View style={styles.metaRow}>
             {timeStr ? (
               <View style={styles.metaItem}>
@@ -125,13 +120,14 @@ export default function EventCard({ event, communityName, communityLogo }: Props
             {event.location ? (
               <View style={styles.metaItem}>
                 <Ionicons name="location-outline" size={13} color={Colors.textMuted} />
-                <Text style={styles.metaText} numberOfLines={1}>{event.location}</Text>
+                <Text style={styles.metaText} numberOfLines={1}>
+                  {event.location}
+                </Text>
               </View>
             ) : null}
           </View>
         ) : null}
 
-        {/* Register CTA */}
         <Pressable
           style={({ pressed }) => [styles.registerBtn, pressed && styles.registerBtnPressed]}
           onPress={() => router.push(`/event/${event.id}`)}>
@@ -151,11 +147,9 @@ const styles = StyleSheet.create({
     borderRadius: Radius.lg,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: Colors.border,
-    marginHorizontal: Spacing.lg,
+    borderColor: RED_BORDER_SUBTLE,
   },
 
-  /* ── Author row ── */
   authorRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -167,21 +161,23 @@ const styles = StyleSheet.create({
     width: AVATAR_SIZE,
     height: AVATAR_SIZE,
     borderRadius: AVATAR_SIZE / 2,
-    borderWidth: 1.5,
-    borderColor: Colors.border,
+    borderWidth: 1,
+    borderColor: RED_BORDER_SUBTLE,
   },
   avatarFallback: {
     width: AVATAR_SIZE,
     height: AVATAR_SIZE,
     borderRadius: AVATAR_SIZE / 2,
-    backgroundColor: Colors.metuRed,
+    backgroundColor: Colors.bgElevated,
+    borderWidth: 1,
+    borderColor: RED_BORDER_SUBTLE,
     justifyContent: 'center',
     alignItems: 'center',
   },
   avatarInitial: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.bold,
-    color: '#fff',
+    color: Colors.metuRed,
   },
   authorInfo: {
     flex: 1,
@@ -197,67 +193,70 @@ const styles = StyleSheet.create({
     marginTop: 1,
   },
 
-  /* ── Hero ── */
+  /* neutral-900-ish hero */
   hero: {
-    height: 210,
+    minHeight: 168,
     padding: Spacing.lg,
     justifyContent: 'space-between',
+    backgroundColor: '#17171c',
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: Colors.border,
+  },
+  heroTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
   },
   dateBadge: {
-    alignSelf: 'flex-start',
     width: 46,
     height: 50,
     borderRadius: Radius.sm,
-    backgroundColor: 'rgba(0,0,0,0.35)',
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1,
+    borderColor: Colors.borderSubtle,
     justifyContent: 'center',
     alignItems: 'center',
   },
   dateDay: {
     fontSize: FontSize.xl,
     fontWeight: FontWeight.bold,
-    color: '#fff',
+    color: Colors.text,
     lineHeight: 24,
   },
   dateMonth: {
     fontSize: FontSize.xxs,
     fontWeight: FontWeight.bold,
-    color: 'rgba(255,255,255,0.85)',
+    color: Colors.textSecondary,
     letterSpacing: 1,
   },
-  paidBadge: {
-    position: 'absolute',
-    top: Spacing.lg,
-    right: Spacing.lg,
+  priceTag: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: Colors.metuRedDim,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.25)',
+    borderColor: 'rgba(227, 6, 19, 0.35)',
     paddingHorizontal: Spacing.sm,
-    paddingVertical: 3,
+    paddingVertical: 4,
     borderRadius: Radius.full,
   },
-  paidBadgeText: {
+  priceTagText: {
     fontSize: FontSize.xxs,
     fontWeight: FontWeight.bold,
-    color: '#fff',
+    color: Colors.metuRed,
   },
   heroBottom: {
+    marginTop: Spacing.md,
     gap: 4,
   },
   heroTitle: {
-    fontSize: FontSize['2xl'],
+    fontSize: FontSize.xl,
     fontWeight: FontWeight.bold,
-    color: '#fff',
-    lineHeight: 29,
-    letterSpacing: -0.4,
-    textShadowColor: 'rgba(0,0,0,0.6)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 6,
+    color: Colors.text,
+    lineHeight: 26,
+    letterSpacing: -0.3,
   },
 
-  /* ── Content ── */
   content: {
     padding: Spacing.lg,
     gap: Spacing.md,

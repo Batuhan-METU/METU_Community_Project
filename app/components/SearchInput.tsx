@@ -28,11 +28,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.neutral900,
-    borderRadius: Radius.sm,
+    borderRadius: Radius.full,
     borderWidth: 1,
     borderColor: Colors.neutral700,
     paddingHorizontal: Spacing.lg,
-    height: 42,
+    minHeight: 44,
     gap: Spacing.sm,
   },
   input: {

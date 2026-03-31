@@ -5,6 +5,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { useChatUnread } from "../../context/ChatUnreadContext";
+import { NavbarNotifications } from "./NavbarNotifications";
 
 function getInitials(name?: string | null, email?: string | null) {
   if (name?.trim()) {
@@ -53,6 +55,7 @@ export default function Navbar() {
   }, [menuOpen]);
 
   const initials = getInitials(user?.full_name, user?.email);
+  const { totalUnread } = useChatUnread();
 
   return (
     <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/90 backdrop-blur">
@@ -90,8 +93,34 @@ export default function Navbar() {
           })}
         </nav>
 
-        {/* Right: auth actions */}
-        <div className="flex min-h-[2.25rem] items-center gap-3">
+        {/* Right: chat + auth */}
+        <div className="flex min-h-[2.25rem] items-center gap-2 sm:gap-3">
+          <Link
+            href="/messages"
+            className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-gray-600 transition duration-200 hover:bg-gray-100 hover:text-gray-900"
+            aria-label="Messages"
+          >
+            <svg
+              className="h-[22px] w-[22px]"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              aria-hidden
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"
+              />
+            </svg>
+            {totalUnread > 0 ? (
+              <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white ring-2 ring-white">
+                {totalUnread > 99 ? "99+" : totalUnread}
+              </span>
+            ) : null}
+          </Link>
+          <NavbarNotifications />
           {isLoading ? (
             <div
               className="h-9 w-28 animate-pulse rounded-full bg-gray-200"

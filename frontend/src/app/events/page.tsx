@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import FilterBar, { FilterCategory } from "../components/FilterBar";
+import { EventListPredictionInfo } from "../components/EventListPredictionInfo";
+import { computeEventListPrediction } from "../lib/eventListPrediction";
 import { mockEvents } from "../lib/mockEvents";
 
 const EVENT_TYPES = [
@@ -141,40 +143,55 @@ export default function EventsPage() {
           </p>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
-            {upcomingEvents.map((event) => (
-              <article
-                key={event.id}
-                className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:shadow-lg"
-              >
-                <Link href={`/events/${event.id}`} className="block">
-                  <div className="h-40 w-full bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500" />
-                  <div className="p-4">
-                    <span className="inline-block rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-600">
-                      {event.category}
-                    </span>
-                    <h3 className="mt-3 text-lg font-semibold text-gray-900">
-                      {event.title}
-                    </h3>
-                    <p className="mt-2 text-sm text-gray-600">
-                      {new Date(event.date).toLocaleDateString("en-US", {
-                        weekday: "short",
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </p>
-                    <p className="mt-1 text-sm text-gray-500">
-                      {event.location}
-                    </p>
-                    <span className="mt-4 inline-block rounded-full bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700">
-                      View Event
-                    </span>
-                  </div>
-                </Link>
-              </article>
-            ))}
+            {upcomingEvents.map((event) => {
+              const { prediction, trendPercent } =
+                computeEventListPrediction(event);
+              return (
+                <div
+                  key={event.id}
+                  className="event-wrapper flex h-full flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                >
+                  <article className="flex min-h-0 flex-1 flex-col">
+                    <Link
+                      href={`/events/${event.id}`}
+                      className="flex min-h-0 flex-1 flex-col"
+                    >
+                      <div className="h-40 w-full shrink-0 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500" />
+                      <div className="flex flex-1 flex-col p-4">
+                        <span className="inline-block w-fit rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-600">
+                          {event.category}
+                        </span>
+                        <h3 className="mt-3 text-lg font-semibold text-gray-900">
+                          {event.title}
+                        </h3>
+                        <p className="mt-2 text-sm text-gray-600">
+                          {new Date(event.date).toLocaleDateString("en-US", {
+                            weekday: "short",
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </p>
+                        <p className="mt-1 text-sm text-gray-500">
+                          {event.location}
+                        </p>
+                        <span className="mt-auto inline-block rounded-full bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700">
+                          View Event
+                        </span>
+                      </div>
+                    </Link>
+                  </article>
+                  <EventListPredictionInfo
+                    interestLevel={prediction.interestLevel}
+                    expectedRange={prediction.expectedRange}
+                    trendPercent={trendPercent}
+                    className="px-4"
+                  />
+                </div>
+              );
+            })}
           </div>
         )}
       </section>

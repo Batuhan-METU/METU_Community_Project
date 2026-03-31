@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import JoinEventButton from "../../components/JoinEventButton";
+import { inferMockEventEndTime } from "../../lib/eventTimeRange";
 import { mockEvents } from "../../lib/mockEvents";
 
 type EventDetailPageProps = {
@@ -32,16 +33,13 @@ export default async function EventDetailPage({
 
   const capacityPercent = Math.min(
     (event.filledSeats / Math.max(event.totalSeats, 1)) * 100,
-    100
+    100,
   );
+
+  const endTimeIso = inferMockEventEndTime(event.date);
 
   return (
     <div className="relative isolate min-h-screen overflow-hidden">
-      {/*
-        Full-page blurred background from mock event.image (e.g. ML → /images/event-images/ai.jpg).
-        Blur applies only to this page body (main); navbar/footer in layout stay sharp.
-        1) Blurred fill image 2) Readability overlay 3) White card on top
-      */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
         <img
           src={event.image}
@@ -62,9 +60,6 @@ export default async function EventDetailPage({
           </Link>
 
           <article className="relative w-full overflow-hidden rounded-2xl bg-white shadow-2xl">
-            {/*
-              Top banner: large hero; image uses object-cover to fill the area.
-            */}
             <div className="relative h-64 w-full overflow-hidden bg-neutral-200 sm:h-72 md:h-80 lg:h-96">
               <img
                 src={event.image}
@@ -120,7 +115,11 @@ export default async function EventDetailPage({
               </div>
 
               <div className="flex flex-wrap items-center gap-3 pt-1">
-                <JoinEventButton />
+                <JoinEventButton
+                  eventId={event.id}
+                  startTime={event.date}
+                  endTime={inferMockEventEndTime(event.date)}
+                />
               </div>
             </div>
           </article>

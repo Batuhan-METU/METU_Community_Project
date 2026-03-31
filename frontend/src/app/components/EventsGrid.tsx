@@ -1,4 +1,5 @@
 import EventCard from "./EventCard";
+import { chatThreadIdForEventClubName } from "../lib/chatNavigation";
 import type { MockEvent } from "../lib/mockEvents";
 
 type EventsGridProps = {
@@ -26,6 +27,7 @@ export default function EventsGrid({ events }: EventsGridProps) {
           location={event.location}
           filledSeats={event.filledSeats}
           totalSeats={event.totalSeats}
+          chatThreadId={chatThreadIdForEventClubName(event.club)}
         />
       ))}
     </div>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { messagesHrefForClubThreadId } from "../lib/chatNavigation";
 
 interface EventCardProps {
   id: number;
@@ -9,17 +10,19 @@ interface EventCardProps {
   filledSeats: number;
   totalSeats: number;
   joined?: boolean;
+  chatThreadId: string;
 }
 
 export default function EventCard({
   id,
   title,
-  club,
+  club: _club,
   date,
   location,
-  filledSeats,
-  totalSeats,
-  joined = false,
+  filledSeats: _filledSeats,
+  totalSeats: _totalSeats,
+  joined: _joined = false,
+  chatThreadId,
 }: EventCardProps) {
   const formattedDate = new Date(date).toLocaleDateString("en-US", {
     day: "2-digit",
@@ -30,18 +33,14 @@ export default function EventCard({
     hour: "2-digit",
     minute: "2-digit",
   });
-  const capacityPercent = Math.min(
-    (filledSeats / Math.max(totalSeats, 1)) * 100,
-    100
-  );
 
   return (
-    <Link href={`/events/${id}`} className="group block h-full">
-      <article className="flex h-full transform flex-col justify-between rounded-2xl bg-slate-950/95 shadow-md shadow-black/40 ring-1 ring-slate-800 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/60">
+    <article className="flex h-full transform flex-col rounded-2xl bg-slate-950/95 shadow-md shadow-black/40 ring-1 ring-slate-800 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/60">
+      <Link href={`/events/${id}`} className="group block flex-1">
         <div className="relative h-40 overflow-hidden rounded-2xl rounded-b-none">
           <div className="h-full w-full bg-gradient-to-br from-indigo-500 via-fuchsia-500 to-orange-400" />
         </div>
-        <div className="flex h-full flex-col justify-between gap-3 rounded-2xl rounded-t-none bg-slate-900 px-4 py-4">
+        <div className="flex flex-col justify-between gap-3 rounded-2xl rounded-t-none bg-slate-900 px-4 py-4">
           <div className="space-y-2">
             <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
               {formattedDate}, {formattedTime}
@@ -51,14 +50,20 @@ export default function EventCard({
             </h3>
             <p className="text-sm text-slate-400">{location}</p>
           </div>
-          <button
-            type="button"
-            className="mt-2 inline-flex w-full items-center justify-center rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-white"
-          >
+          <div className="mt-2 inline-flex w-full items-center justify-center rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-900 transition-colors group-hover:bg-white">
             Register
-          </button>
+          </div>
         </div>
-      </article>
-    </Link>
+      </Link>
+      <div className="border-t border-slate-800/80 px-4 pb-4 pt-1">
+        <Link
+          href={messagesHrefForClubThreadId(chatThreadId)}
+          className="flex w-full items-center justify-center gap-2 rounded-full border border-slate-600/90 bg-slate-800/90 px-3 py-2 text-xs font-medium text-slate-100 transition duration-200 hover:border-indigo-500/50 hover:bg-slate-700/90"
+        >
+          <span aria-hidden>💬</span>
+          Join Chat
+        </Link>
+      </div>
+    </article>
   );
 }

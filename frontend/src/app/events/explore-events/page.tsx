@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { EventListPredictionInfo } from "@/app/components/EventListPredictionInfo";
+import { computeEventListPrediction } from "@/app/lib/eventListPrediction";
 import { mockEvents } from "@/app/lib/mockEvents";
 
 function formatEventCardDate(isoDate: string) {
@@ -101,44 +103,59 @@ export default function ExploreEventsPage() {
 
         <div className="relative z-10 mx-auto max-w-7xl px-6">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {mockEvents.map((event) => (
-            <article
-              key={event.id}
-              className="overflow-hidden rounded-2xl border border-gray-200 bg-white/80 shadow-md backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-gray-300 hover:shadow-xl"
-            >
-              <Link href={`/events/${event.id}`} className="block">
-                <div className="relative aspect-video w-full overflow-hidden rounded-t-2xl bg-slate-200">
-                  <Image
-                    src={event.image}
-                    alt={event.title}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            {mockEvents.map((event) => {
+              const { prediction, trendPercent } =
+                computeEventListPrediction(event);
+              return (
+                <div
+                  key={event.id}
+                  className="event-wrapper flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white/80 shadow-md backdrop-blur-md transition-all duration-300 hover:border-gray-300 hover:shadow-xl"
+                >
+                  <article className="flex min-h-0 flex-1 flex-col">
+                    <Link
+                      href={`/events/${event.id}`}
+                      className="flex min-h-0 flex-1 flex-col"
+                    >
+                      <div className="relative aspect-video w-full shrink-0 overflow-hidden bg-slate-200">
+                        <Image
+                          src={event.image}
+                          alt={event.title}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-transparent" />
+                      </div>
+                      <div className="flex flex-1 flex-col p-5">
+                        <span className="inline-block w-fit rounded-full bg-indigo-100 px-2 py-1 text-xs font-medium text-indigo-600">
+                          {event.category}
+                        </span>
+                        <h2 className="mt-3 text-lg font-semibold text-gray-900">
+                          {event.title}
+                        </h2>
+                        <p className="mt-2 text-sm text-gray-600">
+                          {formatEventCardDate(event.date)}
+                        </p>
+                        <p className="mt-1 text-sm text-gray-500">
+                          {event.location}
+                        </p>
+                        <span className="mt-auto inline-block rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-black">
+                          View Details
+                        </span>
+                      </div>
+                    </Link>
+                  </article>
+                  <EventListPredictionInfo
+                    interestLevel={prediction.interestLevel}
+                    expectedRange={prediction.expectedRange}
+                    trendPercent={trendPercent}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-transparent" />
                 </div>
-                <div className="p-5">
-                  <span className="inline-block rounded-full bg-indigo-100 px-2 py-1 text-xs font-medium text-indigo-600">
-                    {event.category}
-                  </span>
-                  <h2 className="mt-3 text-lg font-semibold text-gray-900">
-                    {event.title}
-                  </h2>
-                  <p className="mt-2 text-sm text-gray-600">
-                    {formatEventCardDate(event.date)}
-                  </p>
-                  <p className="mt-1 text-sm text-gray-500">{event.location}</p>
-                  <span className="mt-4 inline-block rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-black">
-                    View Details
-                  </span>
-                </div>
-              </Link>
-            </article>
-          ))}
-        </div>
+              );
+            })}
+          </div>
         </div>
       </section>
     </div>
   );
 }
-

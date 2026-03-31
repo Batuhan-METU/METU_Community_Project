@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import CommunityRolesSection from "../components/profile/CommunityRolesSection";
+import MyEventsSection from "../components/MyEventsSection";
 import ProfileEventsSection from "../components/profile/ProfileEventsSection";
 import RecommendedCommunitiesSection from "../components/profile/RecommendedCommunitiesSection";
 import { mockClubs } from "../lib/mockClubs";
@@ -63,6 +64,8 @@ export default function ProfilePage() {
             </div>
           </div>
         </section>
+
+        <MyEventsSection />
 
         <ProfileEventsSection />
 

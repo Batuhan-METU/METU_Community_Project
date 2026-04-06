@@ -1,5 +1,6 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
+import type { AdminRole } from '@/lib/useStore';
 import {
   FlatList,
   Pressable,
@@ -15,6 +16,7 @@ import { Colors, Spacing, Radius, FontSize, FontWeight } from '@/constants/theme
 import { MOCK_CLUBS } from '@/constants/mockClubs';
 import { MOCK_EVENTS_FOR_SCREEN } from '@/constants/mockEvents';
 import CompactEventCard from '@/components/CompactEventCard';
+import { useStore } from '@/lib/useStore';
 
 const CATEGORY_GRADIENTS: Record<string, readonly [string, string, string]> = {
   music:      ['#2d1515', '#7f1d1d', '#b91c1c'],
@@ -46,17 +48,44 @@ export default function CommunityDetailScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
-  const club = useMemo(
-    () => MOCK_CLUBS.find((c) => c.id === id) ?? null,
-    [id],
-  );
+  const clubOverrides = useStore((s) => s.clubOverrides[id ?? '']);
+  const userRoles = useStore((s) => s.userRoles);
+  const customEvents = useStore((s) => s.customEvents);
+
+  const canEdit = useMemo(() => {
+    const r = userRoles.find((ur) => ur.clubId === id);
+    return r?.role === 'ADMIN' || r?.role === 'EDITOR';
+  }, [userRoles, id]);
+
+  const adminRole = useMemo<AdminRole | null>(() => {
+    const r = userRoles.find((ur) => ur.clubId === id);
+    return r?.role ?? null;
+  }, [userRoles, id]);
+
+  const club = useMemo(() => {
+    const base = MOCK_CLUBS.find((c) => c.id === id) ?? null;
+    if (!base) return null;
+    if (!clubOverrides) return base;
+    return {
+      ...base,
+      ...(clubOverrides.name && { name: clubOverrides.name }),
+      ...(clubOverrides.desc && { desc: clubOverrides.desc }),
+      ...(clubOverrides.category && { category: clubOverrides.category }),
+      ...(clubOverrides.aboutUs && { aboutUs: clubOverrides.aboutUs }),
+    };
+  }, [id, clubOverrides]);
 
   const upcomingEvents = useMemo(
-    () => MOCK_EVENTS_FOR_SCREEN.filter((e) => e.communityId === id),
-    [id],
+    () => [
+      ...customEvents.filter((e) => e.communityId === id),
+      ...MOCK_EVENTS_FOR_SCREEN.filter((e) => e.communityId === id),
+    ],
+    [id, customEvents],
   );
 
-  const [joined, setJoined] = useState(false);
+  const joined = useStore((s) => s.isClubJoined(id ?? ''));
+  const joinClub = useStore((s) => s.joinClub);
+  const leaveClub = useStore((s) => s.leaveClub);
 
   if (!club) {
     return (
@@ -98,6 +127,15 @@ export default function CommunityDetailScreen() {
             <Ionicons name="arrow-back" size={20} color={Colors.white} />
           </Pressable>
 
+          {/* Chat button */}
+          <Pressable
+            onPress={() => router.push(`/community/${id}/chat`)}
+            style={[styles.chatBtnHero, { top: insets.top + 12 }]}
+            hitSlop={10}
+          >
+            <Ionicons name="chatbubbles" size={16} color={Colors.white} />
+          </Pressable>
+
           {/* Category label */}
           {club.category && (
             <View style={[styles.catBadge, { top: insets.top + 12 }]}>
@@ -113,6 +151,16 @@ export default function CommunityDetailScreen() {
             style={styles.heroFade}
           />
         </View>
+
+        {/* ── Management Mode badge ── */}
+        {canEdit && (
+          <View style={styles.adminBadge}>
+            <Ionicons name="shield-checkmark" size={12} color={Colors.amber} />
+            <Text style={styles.adminBadgeText}>
+              {adminRole === 'ADMIN' ? 'Admin' : 'Editor'} Mode
+            </Text>
+          </View>
+        )}
 
         {/* ── Club identity block ── */}
         <View style={styles.identity}>
@@ -147,28 +195,63 @@ export default function CommunityDetailScreen() {
             </View>
           </View>
 
-          {/* Join / Leave toggle */}
-          <Pressable
-            style={({ pressed }) => [
-              styles.joinBtn,
-              joined && styles.joinBtnActive,
-              pressed && { opacity: 0.82 },
-              { borderColor: joined ? accentColor + '66' : Colors.metuRed },
-            ]}
-            onPress={() => setJoined((v) => !v)}
-            accessibilityRole="button"
-            accessibilityLabel={joined ? 'Leave community' : 'Join community'}
-          >
-            <Ionicons
-              name={joined ? 'checkmark-circle' : 'people-outline'}
-              size={16}
-              color={joined ? accentColor : Colors.white}
-            />
-            <Text style={[styles.joinBtnText, joined && { color: accentColor }]}>
-              {joined ? 'Community Joined' : 'Join Community'}
-            </Text>
-          </Pressable>
+          {/* Action buttons row */}
+          <View style={styles.actionBtnsRow}>
+            {/* Join / Leave toggle */}
+            <Pressable
+              style={({ pressed }) => [
+                styles.joinBtn,
+                joined && styles.joinBtnActive,
+                pressed && { opacity: 0.82 },
+                { borderColor: joined ? accentColor + '66' : Colors.metuRed },
+              ]}
+              onPress={() => {
+                if (!id) return;
+                if (joined) leaveClub(id);
+                else joinClub(id);
+              }}
+              accessibilityRole="button"
+              accessibilityLabel={joined ? 'Leave community' : 'Join community'}
+            >
+              <Ionicons
+                name={joined ? 'checkmark-circle' : 'people-outline'}
+                size={16}
+                color={joined ? accentColor : Colors.white}
+              />
+              <Text style={[styles.joinBtnText, joined && { color: accentColor }]}>
+                {joined ? 'Joined' : 'Join Community'}
+              </Text>
+            </Pressable>
+
+            {/* Group Chat button */}
+            <Pressable
+              style={({ pressed }) => [styles.chatBtn, pressed && { opacity: 0.82 }]}
+              onPress={() => router.push(`/community/${id}/chat`)}
+              accessibilityRole="button"
+              accessibilityLabel="Open group chat"
+            >
+              <Ionicons name="chatbubbles-outline" size={16} color={Colors.white} />
+              <Text style={styles.chatBtnText}>Group Chat</Text>
+            </Pressable>
+          </View>
         </View>
+
+        {/* ── Admin: Create Post/Event ── */}
+        {canEdit && (
+          <Pressable
+            style={({ pressed }) => [styles.createBanner, pressed && { opacity: 0.85 }]}
+            onPress={() => router.push(`/create-post?clubId=${id}`)}
+          >
+            <View style={styles.createBannerIcon}>
+              <Ionicons name="add-circle" size={20} color={Colors.amber} />
+            </View>
+            <View style={styles.createBannerText}>
+              <Text style={styles.createBannerTitle}>Create Post / Event</Text>
+              <Text style={styles.createBannerSub}>Publish to this community</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />
+          </Pressable>
+        )}
 
         {/* ── About Us ── */}
         <View style={styles.section}>
@@ -204,8 +287,23 @@ export default function CommunityDetailScreen() {
         )}
 
         {/* Bottom spacing */}
-        <View style={{ height: insets.bottom + Spacing.xxxl }} />
+        <View style={{ height: insets.bottom + Spacing.xxxl + (canEdit ? 70 : 0) }} />
       </ScrollView>
+
+      {/* ── Admin FAB ── */}
+      {canEdit && (
+        <Pressable
+          style={({ pressed }) => [
+            styles.fab,
+            { bottom: insets.bottom + 20 },
+            pressed && { opacity: 0.85, transform: [{ scale: 0.96 }] },
+          ]}
+          onPress={() => router.push(`/edit-club?id=${id}`)}
+        >
+          <Ionicons name="create" size={18} color={Colors.white} />
+          <Text style={styles.fabText}>Edit Page</Text>
+        </Pressable>
+      )}
     </View>
   );
 }
@@ -257,6 +355,18 @@ const styles = StyleSheet.create({
   backBtn: {
     position: 'absolute',
     left: Spacing.lg,
+    width: 38,
+    height: 38,
+    borderRadius: Radius.full,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  chatBtnHero: {
+    position: 'absolute',
+    left: Spacing.lg + 50,
     width: 38,
     height: 38,
     borderRadius: Radius.full,
@@ -360,7 +470,15 @@ const styles = StyleSheet.create({
     height: 20,
     backgroundColor: Colors.border,
   },
+
+  /* ── Action buttons ── */
+  actionBtnsRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    width: '100%',
+  },
   joinBtn: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -369,17 +487,32 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.metuRedLight,
     paddingVertical: 13,
-    paddingHorizontal: Spacing.xxxl,
     borderRadius: Radius.full,
-    width: '100%',
   },
   joinBtnActive: {
     backgroundColor: 'transparent',
   },
   joinBtnText: {
-    fontSize: FontSize.base,
+    fontSize: FontSize.sm,
     fontWeight: FontWeight.semibold,
     color: Colors.white,
+  },
+  chatBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.sm,
+    backgroundColor: Colors.bgCard,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    paddingVertical: 13,
+    paddingHorizontal: Spacing.lg,
+    borderRadius: Radius.full,
+  },
+  chatBtnText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.text,
   },
 
   /* ── Sections ── */
@@ -423,5 +556,82 @@ const styles = StyleSheet.create({
   },
   eventCardWrap: {
     width: 172,
+  },
+
+  /* ── Admin badge ── */
+  adminBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'center',
+    gap: 5,
+    backgroundColor: 'rgba(251,191,36,0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(251,191,36,0.25)',
+    borderRadius: Radius.full,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: 5,
+    marginTop: -(Spacing.md),
+    marginBottom: Spacing.sm,
+  },
+  adminBadgeText: {
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.bold,
+    color: Colors.amber,
+    letterSpacing: 0.4,
+  },
+
+  /* ── Create banner ── */
+  createBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: Spacing.xxl,
+    marginTop: Spacing.xl,
+    backgroundColor: Colors.bgElevated,
+    borderRadius: Radius.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(251,191,36,0.2)',
+    padding: Spacing.lg,
+    gap: Spacing.md,
+  },
+  createBannerIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(251,191,36,0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  createBannerText: { flex: 1, gap: 2 },
+  createBannerTitle: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.bold,
+    color: Colors.text,
+  },
+  createBannerSub: {
+    fontSize: FontSize.xs,
+    color: Colors.textMuted,
+  },
+
+  /* ── FAB ── */
+  fab: {
+    position: 'absolute',
+    right: Spacing.xxl,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    backgroundColor: Colors.amber,
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing.md,
+    borderRadius: Radius.full,
+    elevation: 6,
+    shadowColor: Colors.amber,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+  },
+  fabText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.bold,
+    color: Colors.black,
   },
 });

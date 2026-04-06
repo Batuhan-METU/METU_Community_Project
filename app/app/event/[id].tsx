@@ -12,6 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Spacing, Radius, FontSize, FontWeight } from '@/constants/theme';
 import { MOCK_EVENTS_FOR_SCREEN } from '@/constants/mockEvents';
+import { useStore } from '@/lib/useStore';
 
 const HEADER_HEIGHT = 260;
 const STICKY_BAR_HEIGHT = 72;
@@ -35,10 +36,20 @@ export default function EventDetailScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
+  const isRegistered = useStore((s) => s.isEventRegistered(id ?? ''));
+  const seatInfo = useStore((s) => s.getSeats(id ?? ''));
+  const registerEvent = useStore((s) => s.registerEvent);
+  const unregisterEvent = useStore((s) => s.unregisterEvent);
+
   const event = useMemo(
     () => MOCK_EVENTS_FOR_SCREEN.find((e) => e.id === id) ?? null,
     [id],
   );
+
+  const seatFraction = seatInfo
+    ? Math.min(seatInfo.currentParticipants / seatInfo.totalSeats, 1)
+    : 0;
+  const seatFull = seatInfo ? seatInfo.currentParticipants >= seatInfo.totalSeats : false;
 
   if (!event) {
     return (
@@ -215,6 +226,37 @@ export default function EventDetailScreen() {
               </View>
             </>
           )}
+
+          {/* Seat capacity */}
+          {seatInfo && (
+            <>
+              <View style={styles.divider} />
+              <View style={styles.seatSection}>
+                <View style={styles.seatHeader}>
+                  <Ionicons name="people-outline" size={16} color={Colors.textSecondary} />
+                  <Text style={styles.seatLabel}>
+                    {seatInfo.currentParticipants}/{seatInfo.totalSeats} seats filled
+                  </Text>
+                  {seatFull && (
+                    <View style={styles.fullBadge}>
+                      <Text style={styles.fullBadgeText}>FULL</Text>
+                    </View>
+                  )}
+                </View>
+                <View style={styles.seatBarBg}>
+                  <View
+                    style={[
+                      styles.seatBarFill,
+                      {
+                        width: `${Math.round(seatFraction * 100)}%`,
+                        backgroundColor: seatFraction > 0.9 ? Colors.danger : seatFraction > 0.7 ? Colors.amber : Colors.emerald,
+                      },
+                    ]}
+                  />
+                </View>
+              </View>
+            </>
+          )}
         </View>
       </ScrollView>
 
@@ -234,14 +276,26 @@ export default function EventDetailScreen() {
           )}
           <Pressable
             style={({ pressed }) => [
-              styles.registerBtn,
-              pressed && styles.registerBtnPressed,
+              isRegistered ? styles.unregisterBtn : styles.registerBtn,
+              pressed && { opacity: 0.82 },
             ]}
+            onPress={() => {
+              if (!id) return;
+              if (isRegistered) unregisterEvent(id);
+              else if (!seatFull) registerEvent(id);
+            }}
+            disabled={seatFull && !isRegistered}
             accessibilityRole="button"
-            accessibilityLabel="Register for this event"
+            accessibilityLabel={isRegistered ? 'Cancel registration' : 'Register for this event'}
           >
-            <Text style={styles.registerText}>Register for Event</Text>
-            <Ionicons name="arrow-forward" size={15} color={Colors.white} />
+            <Ionicons
+              name={isRegistered ? 'checkmark-circle' : 'arrow-forward'}
+              size={15}
+              color={isRegistered ? Colors.metuRed : Colors.white}
+            />
+            <Text style={[styles.registerText, isRegistered && styles.unregisterText]}>
+              {isRegistered ? 'Cancel Registration' : seatFull ? 'Event Full' : 'Register for Event'}
+            </Text>
           </Pressable>
         </View>
       </View>
@@ -512,12 +566,62 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: Radius.md,
   },
-  registerBtnPressed: {
-    backgroundColor: Colors.metuRedLight,
+  unregisterBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.sm,
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
+    borderColor: Colors.metuRed,
+    paddingVertical: 13,
+    borderRadius: Radius.md,
   },
   registerText: {
     fontSize: FontSize.base,
     fontWeight: FontWeight.semibold,
     color: Colors.white,
+  },
+  unregisterText: {
+    color: Colors.metuRed,
+  },
+
+  /* ── Seat capacity ── */
+  seatSection: {
+    gap: Spacing.sm,
+  },
+  seatHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  seatLabel: {
+    fontSize: FontSize.sm,
+    color: Colors.textSecondary,
+    fontWeight: FontWeight.medium,
+  },
+  fullBadge: {
+    backgroundColor: Colors.danger,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    marginLeft: 'auto',
+  },
+  fullBadgeText: {
+    fontSize: 9,
+    fontWeight: FontWeight.bold,
+    color: Colors.white,
+    letterSpacing: 0.6,
+  },
+  seatBarBg: {
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: Colors.bgCard,
+    overflow: 'hidden',
+  },
+  seatBarFill: {
+    height: 6,
+    borderRadius: 3,
   },
 });

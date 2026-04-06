@@ -91,6 +91,7 @@ export function JoinedEventsProvider({
         JOINED_EVENTS_STORAGE_KEY,
         JSON.stringify(next),
       );
+      window.dispatchEvent(new Event("metu-joined-changed"));
       return next;
     });
   }, []);

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
+import { ClubChatSection } from "../../components/clubs/ClubChatSection";
 import { mockClubs } from "../../lib/mockClubs";
 import { mockEvents } from "../../lib/mockEvents";
 
@@ -153,6 +154,7 @@ export default async function ClubDetailPage({ params }: ClubDetailPageProps) {
 
         {/* Right column */}
         <aside className="space-y-6">
+          <ClubChatSection clubId={club.id} />
           <section className="rounded-2xl border border-slate-200/70 bg-white/85 p-5 shadow-lg shadow-slate-900/5 backdrop-blur animate-fade-in-up">
             <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
               Community Info

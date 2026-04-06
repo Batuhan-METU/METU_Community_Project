@@ -22,8 +22,9 @@
   - Ana sayfada:
     - Öne çıkan topluluklar (backend'den çekilen)
     - Yaklaşan etkinlikler (backend'den çekilen)
+      
+**`app/`** | React Native + Expo | iOS ve Android platformları için mobil uygulama katmanı. |
 
-İleride `app/` altında React Native / Expo ile mobil uygulama da eklenecektir.
 
 ### Geliştirme Ortamı
 
@@ -52,6 +53,14 @@ npm run dev
 ```
 
 Varsayılan olarak `http://localhost:3000` adresinde çalışır ve backend'e bağlanır.
+
+#### Mobile App (expo) çalıştırma
+
+```bash
+cd app
+npm install
+npx expo start
+```
 
 ### Yol Haritası (Kısa Vadeli)
 

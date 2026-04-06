@@ -1,15 +1,62 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import type { OccupiedSlotInfo } from "../lib/resolveEventTimeRange";
+import { findSchedulingConflict } from "../lib/schedulingConflict";
+import { useJoinedEvents } from "../../context/JoinedEventsContext";
+import { ScheduleConflictModal } from "./ScheduleConflictModal";
 
-export default function JoinEventButton() {
-  const [joined, setJoined] = useState(false);
+type JoinEventButtonProps = {
+  /** Numeric catalog id or string id (e.g. conflict demo `event1`). */
+  eventId: number | string;
+  startTime: string;
+  endTime: string;
+};
+
+export default function JoinEventButton({
+  eventId,
+  startTime,
+  endTime,
+}: JoinEventButtonProps) {
+  const { isJoined, markJoined, getOccupiedSlotsForConflict } =
+    useJoinedEvents();
+  const joined = isJoined(eventId);
+  const [conflict, setConflict] = useState<OccupiedSlotInfo | null>(null);
+  const [sessionSuccess, setSessionSuccess] = useState(false);
+
+  const othersSchedule = getOccupiedSlotsForConflict(eventId);
+
+  const completeJoin = useCallback(() => {
+    // Only persist join — post-event rating notifications are created later by time-based sync.
+    markJoined(eventId);
+    setConflict(null);
+    setSessionSuccess(true);
+  }, [eventId, markJoined]);
+
+  const cancelConflict = useCallback(() => {
+    setConflict(null);
+  }, []);
+
+  const handleJoinClick = () => {
+    if (joined) {
+      return;
+    }
+    const firstConflict = findSchedulingConflict(
+      { startTime, endTime },
+      othersSchedule,
+    );
+    if (firstConflict) {
+      setConflict(firstConflict);
+      return;
+    }
+    completeJoin();
+  };
 
   return (
     <div>
       <button
         type="button"
-        onClick={() => setJoined(true)}
+        onClick={handleJoinClick}
         disabled={joined}
         className={`inline-flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-semibold transition-all duration-200 ${
           joined
@@ -38,13 +85,21 @@ export default function JoinEventButton() {
         role="status"
         aria-live="polite"
         className={`overflow-hidden transition-all duration-300 ${
-          joined ? "mt-3 max-h-16 opacity-100" : "max-h-0 opacity-0"
+          sessionSuccess && joined ? "mt-3 max-h-16 opacity-100" : "max-h-0 opacity-0"
         }`}
       >
         <p className="text-sm text-emerald-700">
           Successfully joined the event
         </p>
       </div>
+
+      {conflict ? (
+        <ScheduleConflictModal
+          conflictingEvent={conflict}
+          onContinueAnyway={completeJoin}
+          onCancel={cancelConflict}
+        />
+      ) : null}
     </div>
   );
 }

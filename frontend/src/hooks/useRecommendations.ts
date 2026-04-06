@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { JOINED_EVENTS_STORAGE_KEY } from "../context/JoinedEventsContext";
 
 /** localStorage key for rated event id list (optional; falls back to `eventRatings`). */
@@ -228,6 +228,18 @@ function computeRecommendation<T extends RecommendationEventInput>(
 }
 
 /**
+ * After mount, `true`. Until then, skip reading `localStorage` so SSR + first client
+ * paint match (avoids hydration mismatches from joined/rated state).
+ */
+function useHydrated(): boolean {
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+  return hydrated;
+}
+
+/**
  * Ranks catalog events for the current user using localStorage (`joinedEvents`, `ratedEvents` or `eventRatings`)
  * and a simple additive score. Returns the top 6 rows with `recommendationScore` and `reason` set.
  */
@@ -235,15 +247,17 @@ export function useRecommendations<T extends RecommendationEventInput>(
   events: readonly T[],
   user: RecommendationUser,
 ): RecommendedEvent<T>[] {
+  const hydrated = useHydrated();
+
   const storageKey = useSyncExternalStore(
     subscribeRecommendationsStorage,
-    getStorageSnapshot,
+    () => (hydrated ? getStorageSnapshot() : getServerSnapshot()),
     getServerSnapshot,
   );
 
   return useMemo(() => {
-    const joinedIdsList = readJoinedIds();
-    const ratedIdsList = readRatedEventIds();
+    const joinedIdsList = hydrated ? readJoinedIds() : [];
+    const ratedIdsList = hydrated ? readRatedEventIds() : [];
     const joinedIds = new Set(joinedIdsList.map(String));
     const ratedIds = new Set(ratedIdsList);
 
@@ -275,5 +289,5 @@ export function useRecommendations<T extends RecommendationEventInput>(
     });
 
     return scored.slice(0, 6) as RecommendedEvent<T>[];
-  }, [events, user, storageKey]);
+  }, [events, user, storageKey, hydrated]);
 }

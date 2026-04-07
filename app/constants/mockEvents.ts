@@ -2,10 +2,12 @@ import type { CommunityEvent } from '@/lib/types';
 
 /**
  * Web-aligned demo rows for the Events tab (used when API returns nothing or fails).
+ * communityId links to MOCK_CLUBS ids in mockClubs.ts.
  */
 export type EventsScreenEvent = CommunityEvent & {
   category: string;
   community: string;
+  communityId?: string;
 };
 
 export const MOCK_EVENTS_FOR_SCREEN: EventsScreenEvent[] = [
@@ -17,7 +19,8 @@ export const MOCK_EVENTS_FOR_SCREEN: EventsScreenEvent[] = [
     description: 'Hands-on ML session. Capacity: 42/80 seats. Free entry.',
     is_paid: false,
     ticket_price: null,
-    community: 'METU Computer Society',
+    community: 'AI Builders Club',
+    communityId: '2',
     category: 'Technology',
   },
   {
@@ -28,7 +31,8 @@ export const MOCK_EVENTS_FOR_SCREEN: EventsScreenEvent[] = [
     description: 'Stargazing on campus. Capacity: 30/80 seats. Free entry.',
     is_paid: false,
     ticket_price: null,
-    community: 'Astronomy Club',
+    community: 'Astronomy Society',
+    communityId: '6',
     category: 'Science',
   },
   {
@@ -50,7 +54,8 @@ export const MOCK_EVENTS_FOR_SCREEN: EventsScreenEvent[] = [
     description: 'Design sprint & portfolio tips. Capacity: 20/40 seats. Free entry.',
     is_paid: false,
     ticket_price: null,
-    community: 'METU Design Club',
+    community: 'Visual Arts Collective',
+    communityId: '4',
     category: 'Art',
   },
   {
@@ -61,7 +66,8 @@ export const MOCK_EVENTS_FOR_SCREEN: EventsScreenEvent[] = [
     description: 'Open-air acoustic sets. Capacity: 150/500 seats. Free entry.',
     is_paid: false,
     ticket_price: null,
-    community: 'METU Music Society',
+    community: 'Campus Music Night',
+    communityId: '1',
     category: 'Entertainment',
   },
   {

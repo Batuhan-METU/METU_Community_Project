@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Platform, StyleSheet, View } from 'react-native';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
@@ -8,36 +8,15 @@ import * as SecureStore from 'expo-secure-store';
 import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { AUTH_TOKEN_KEY } from '@/lib/api';
-import { Colors, palette } from '@/constants/theme';
-
-/* ─── Navigation (React-Navigation) themes ─── */
-const darkNavTheme = {
-  ...DarkTheme,
-  colors: {
-    ...DarkTheme.colors,
-    background: Colors.bg,
-    card: Colors.bg,
-    text: Colors.text,
-    border: Colors.border,
-    primary: Colors.indigo,
-  },
-};
-
-const lightNavTheme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    background: palette.light.background,
-    card: palette.light.background,
-    text: '#111827',
-    border: '#e5e7eb',
-    primary: Colors.indigo,
-  },
-};
+import { ColorsDark, ColorsLight, palette } from '@/constants/theme';
+import { useStore } from '@/lib/useStore';
+import { ThemeContext, resolveScheme, colorsFor } from '@/hooks/useColors';
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme !== 'light';
+  const systemScheme = useColorScheme();
+  const colorSchemeSetting = useStore((s) => s.colorSchemeSetting);
+  const isDark = resolveScheme(colorSchemeSetting, systemScheme);
+  const colors = colorsFor(isDark);
 
   const [isLoading, setIsLoading] = useState(true);
   const [hasToken, setHasToken] = useState(false);
@@ -54,25 +33,14 @@ export default function RootLayout() {
     return () => { cancelled = true; };
   }, []);
 
-  /* ─── Android nav bar: force dark immediately on cold start ─── */
-  useEffect(() => {
-    if (Platform.OS !== 'android') return;
-    void (async () => {
-      try {
-        await NavigationBar.setBackgroundColorAsync('#0a0a0f');
-        await NavigationBar.setButtonStyleAsync('light');
-      } catch { /* best-effort */ }
-    })();
-  }, []); // empty dep → runs once at mount, before any frame is painted
-
-  /* ─── Android nav bar: keep in sync when OS scheme changes ─── */
+  /* ─── Android nav bar: sync with effective scheme ─── */
   useEffect(() => {
     if (Platform.OS !== 'android') return;
     void (async () => {
       try {
         if (isDark) {
-          await NavigationBar.setBackgroundColorAsync('#0a0a0f');
-          await NavigationBar.setButtonStyleAsync('light');
+          await NavigationBar.setBackgroundColorAsync(palette.dark.background);
+          await NavigationBar.setButtonStyleAsync(palette.dark.buttonStyle);
         } else {
           await NavigationBar.setBackgroundColorAsync(palette.light.background);
           await NavigationBar.setButtonStyleAsync(palette.light.buttonStyle);
@@ -81,35 +49,73 @@ export default function RootLayout() {
     })();
   }, [isDark]);
 
-  const navTheme = isDark ? darkNavTheme : lightNavTheme;
+  const navTheme = useMemo(
+    () =>
+      isDark
+        ? {
+            ...DarkTheme,
+            colors: {
+              ...DarkTheme.colors,
+              background: ColorsDark.bg,
+              card: ColorsDark.bg,
+              text: ColorsDark.text,
+              border: ColorsDark.border,
+              primary: ColorsDark.indigo,
+            },
+          }
+        : {
+            ...DefaultTheme,
+            colors: {
+              ...DefaultTheme.colors,
+              background: ColorsLight.bg,
+              card: ColorsLight.bg,
+              text: ColorsLight.text,
+              border: ColorsLight.border,
+              primary: ColorsLight.indigo,
+            },
+          },
+    [isDark],
+  );
+
   const statusStyle = isDark ? palette.dark.statusBarStyle : palette.light.statusBarStyle;
   const statusBg = isDark ? palette.dark.background : palette.light.background;
 
+  const themeCtx = useMemo(() => ({ colors, isDark }), [colors, isDark]);
+
   if (isLoading) {
     return (
-      <ThemeProvider value={navTheme}>
-        <View style={[styles.loadingContainer, { backgroundColor: statusBg }]}>
-          <ActivityIndicator size="large" color={Colors.indigo} />
-        </View>
-        <StatusBar style={statusStyle} backgroundColor={statusBg} translucent={false} />
-      </ThemeProvider>
+      <ThemeContext.Provider value={themeCtx}>
+        <ThemeProvider value={navTheme}>
+          <View style={[styles.loadingContainer, { backgroundColor: statusBg }]}>
+            <ActivityIndicator size="large" color={colors.indigo} />
+          </View>
+          <StatusBar style={statusStyle} backgroundColor={statusBg} translucent={false} />
+        </ThemeProvider>
+      </ThemeContext.Provider>
     );
   }
 
   return (
-    <ThemeProvider value={navTheme}>
-      <Stack
-        screenOptions={{ headerShown: false, animation: 'fade' }}
-        initialRouteName={hasToken ? '(tabs)' : '(auth)'}
-      >
-        <Stack.Screen name="(auth)" />
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="login" options={{ presentation: 'modal' }} />
-        <Stack.Screen name="event/[id]" />
-        <Stack.Screen name="community/[id]" />
-      </Stack>
-      <StatusBar style={statusStyle} backgroundColor={statusBg} translucent={false} />
-    </ThemeProvider>
+    <ThemeContext.Provider value={themeCtx}>
+      <ThemeProvider value={navTheme}>
+        <Stack
+          screenOptions={{ headerShown: false, animation: 'fade' }}
+          initialRouteName={hasToken ? '(tabs)' : '(auth)'}
+        >
+          <Stack.Screen name="(auth)" />
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="login" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="event/[id]" />
+          <Stack.Screen name="community/[id]" />
+          <Stack.Screen name="hype" options={{ animation: 'slide_from_right' }} />
+          <Stack.Screen name="notifications" options={{ animation: 'slide_from_right' }} />
+          <Stack.Screen name="profile-edit" options={{ animation: 'slide_from_right' }} />
+          <Stack.Screen name="edit-club" options={{ animation: 'slide_from_right' }} />
+          <Stack.Screen name="create-post" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+        </Stack>
+        <StatusBar style={statusStyle} backgroundColor={statusBg} translucent={false} />
+      </ThemeProvider>
+    </ThemeContext.Provider>
   );
 }
 

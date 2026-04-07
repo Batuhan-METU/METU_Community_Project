@@ -6,6 +6,7 @@ import { Colors, Spacing, Radius, FontSize, FontWeight } from '@/constants/theme
 import ClubCard, { type ClubItem } from '@/components/ClubCard';
 import SearchInput from '@/components/SearchInput';
 import { api } from '@/lib/api';
+import { MOCK_CLUBS } from '@/constants/mockClubs';
 import type { Community } from '@/lib/types';
 
 /* ─── Category filter strip ─── */
@@ -22,16 +23,6 @@ function categorySlug(s: string | undefined | null): string | undefined {
   const t = s?.trim().toLowerCase().replace(/\s+/g, '');
   return t || undefined;
 }
-
-/* ─── Mock clubs (always visible) ─── */
-const MOCK_CLUBS: ClubItem[] = [
-  { id: '1', name: 'Campus Music Night',      desc: 'Live performances, open mic sessions, and community-led jam circles.', category: 'music' },
-  { id: '2', name: 'AI Builders Club',         desc: 'Hands-on ML projects, model demos, and technical peer mentoring.', category: 'technology' },
-  { id: '3', name: 'Robotics Club',            desc: 'Build robots, compete in workshops, and learn embedded systems together.', category: 'technology' },
-  { id: '4', name: 'Visual Arts Collective',   desc: 'Weekly illustration sessions, gallery tours, and collaborative exhibitions.', category: 'art' },
-  { id: '5', name: 'Photography Walk Crew',    desc: 'Campus photo walks, editing labs, and friendly critique sessions.', category: 'art' },
-  { id: '6', name: 'Astronomy Society',        desc: 'Night observations, telescope workshops, and science outreach.', category: 'science' },
-];
 
 /* ─── Screen ─── */
 export default function CommunitiesScreen() {
